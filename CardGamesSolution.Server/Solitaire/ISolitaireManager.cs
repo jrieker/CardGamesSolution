@@ -1,13 +1,13 @@
-﻿using CardGamesSolution.Server.Shared;
+using System.Collections.Generic;
 
-namespace CardGamesSolution.Server.Solitaire
-{
-    public interface ISolitaireManager : ICardGamesManager
-    {
+namespace SolitaireEngine {
+    public interface ISolitaireManager {
         void StartNewGame();
         void Move(Card card, string fromPile, string toPile);
-        void DealCards();  // Optional - if used for animations
+        void DealCards();  // Placeholder, waiting for UI
         void Restart();
+        void DrawFromStock();
         GameState GetGameState();
     }
+    // connects engine and UI
 }
