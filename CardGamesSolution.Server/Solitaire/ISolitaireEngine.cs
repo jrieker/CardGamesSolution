@@ -1,12 +1,11 @@
-﻿using CardGamesSolution.Server.Shared;
+using System.Collections.Generic;
 
-namespace CardGamesSolution.Server.Solitaire
-{
-    public interface ISolitaireEngine : ICardGamesEngine
-    {
+namespace SolitaireEngine {
+    public interface ISolitaireEngine {
         void InitializeGame(List<Card> cards);
         MoveResult ProcessMove(Card card, string fromPile, string toPile);
         bool CheckForWin();
         GameState GetGameState();
     }
+    // defines logic operations
 }
