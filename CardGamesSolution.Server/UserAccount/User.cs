@@ -1,6 +1,4 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace CardGamesSolution.Server.Shared
+﻿namespace CardGamesSolution.Server.UserAccount
 {
     public class User : IUserAccessor
     {
@@ -11,6 +9,25 @@ namespace CardGamesSolution.Server.Shared
         public int Losses { get; set; }
         public float Balance { get; set; }
 
+        //Constructors
+        public User(string username, string password)
+        {
+            this.Username = username;
+            this.Password = password;
+            this.Wins = 0;
+            this.Losses = 0;
+            this.Balance = 0f;
+        }
+
+        public User(string username, string password, int wins, int losses, float balance)
+        {
+            this.Username = username;
+            this.Password = password;
+            this.Wins = wins;
+            this.Losses = losses;
+            this.Balance = balance;
+        }
+
         // Method placeholders
         public void SaveStats()
         {
@@ -19,17 +36,17 @@ namespace CardGamesSolution.Server.Shared
 
         public void UpdateBalance(float amount)
         {
-            // TODO: Add amount to balance or subtract if negative
+            this.Balance += amount;
         }
 
         public void AddWin()
         {
-            // TODO: Increment wins
+            this.Wins++;
         }
 
         public void AddLoss()
         {
-            // TODO: Increment losses
+            this.Losses++;
         }
     }
 }
