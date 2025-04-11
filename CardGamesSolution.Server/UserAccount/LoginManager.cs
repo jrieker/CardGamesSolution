@@ -7,10 +7,10 @@
         {
             Console.WriteLine("=== LOGIN ===");
             Console.Write("Username: ");
-            string username = Console.ReadLine().Trim();
+            string username = Console.ReadLine() ?? string.Empty.Trim();
             //TODO: Check if username exists in DB
             Console.Write("Password: ");
-            string password = Console.ReadLine().Trim();
+            string password = Console.ReadLine() ?? string.Empty.Trim();
             //TODO check if password matches
             Console.WriteLine("\nLogging in...\n");
             User user = new User(username, password);

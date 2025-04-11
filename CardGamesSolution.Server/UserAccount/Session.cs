@@ -1,6 +1,5 @@
-﻿using CardGamesSolution.Server.Shared;
-using CardGamesSolution.Server.Solitaire;
-using CardGamesSolution.Server.UserAccount;
+﻿using CardGamesSolution.Server;
+using SolitaireEngine;
 
 namespace CardGamesSolution.Server.UserAccount
 {
@@ -32,13 +31,15 @@ namespace CardGamesSolution.Server.UserAccount
             Console.WriteLine("3) Exit");
 
             Console.Write("Enter your choice (1/2/3): ");
-            var input = Console.ReadLine().Trim().ToLower();
+            string input = Console.ReadLine() ?? string.Empty.Trim().ToLower();
             switch (input)
             {
                 case "1":
                 case "solitaire":
                     Console.WriteLine("Starting Solitaire...\n");
-                    //ISolitaireManager.StartNewGame();
+                    ISolitaireEngine solitaireEngine = new SolitaireEngine.SolitaireEngine();
+                    ISolitaireManager solitaireManager = new SolitaireManager(solitaireEngine);
+                    solitaireManager.StartNewGame();
                     break;
 
                 case "2":
@@ -46,7 +47,7 @@ namespace CardGamesSolution.Server.UserAccount
                     while (true) 
                     {
                         Console.Write("Would you like to log in more players? (yes/no): ");
-                        string response = Console.ReadLine().Trim().ToLower();
+                        string response = Console.ReadLine() ?? string.Empty.Trim().ToLower();
                         if (response == "yes")
                         {
                             users.Add(LoginManager.Login());
