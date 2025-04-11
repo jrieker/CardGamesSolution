@@ -1,4 +1,7 @@
-﻿namespace CardGamesSolution.Server.UserAccount
+﻿using System;
+using Microsoft.Data.SqlClient;
+
+namespace CardGamesSolution.Server.UserAccount
 {
     public class User : IUserAccessor
     {
@@ -47,6 +50,23 @@
         public void AddLoss()
         {
             this.Losses++;
+        }
+
+        public void TestDatabaseConnection()
+        {
+            string connString="Data Source=localhost,1433;Initial Catalog=master;User ID=sa;Password=SuperSecure123;TrustServerCertificate=true";
+            Console.WriteLine("Getting Connection ...");
+            SqlConnection conn = new SqlConnection(connString);
+            try
+            {
+            Console.WriteLine("Openning Connection ...");
+            conn.Open();
+            Console.WriteLine("Connection successful!");
+            }
+            catch (Exception e)
+            {
+            Console.WriteLine("Error: " + e.Message);
+            }
         }
     }
 }
