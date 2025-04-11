@@ -12,6 +12,32 @@ namespace CardGamesSolution.Server.Blackjack
             BlackJackEngine = engine;
         }
 
+    //Added intialize
+    public void Intialize(User[] Users)
+    {   
+        int length = Users.Length;
+        Player[] players = new Player[length];
+        int i = 0;
+
+    //Reads in the user information from the players list
+    foreach (User user in Users) {
+        players[i] = new Player(user.UserID, user.Username, user.Balance);
+        i++;
+    }
+
+    Deck startingDeck = new Deck();
+    Hand startingHand = new Hand(startingDeck);
+
+    Hand dealersHand = new Hand(startingDeck);
+
+    //Starts the game
+    StartGame(players, dealersHand, startingDeck);
+
+
+}
+
+
+        
         public void StartGame(Player[] players, Hand dealersHand, Deck deck)
         {
             BlackJackEngine.DealHands(players, dealersHand, deck);
