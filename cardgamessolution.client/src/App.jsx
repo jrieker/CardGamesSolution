@@ -1,51 +1,41 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import './App.css';
 
 function App() {
-    const [forecasts, setForecasts] = useState();
+    const [screen, setScreen] = useState('main'); // main, solitaireAuth, blackjackAuth, blackjackPlayer2
+    const [authMode, setAuthMode] = useState('login'); // login or create
 
-    useEffect(() => {
-        populateWeatherData();
-    }, []);
-
-    const contents = forecasts === undefined
-        ? <p><em>Loading... Please refresh once the ASP.NET backend has started. See <a href="https://aka.ms/jspsintegrationreact">https://aka.ms/jspsintegrationreact</a> for more details.</em></p>
-        : <table className="table table-striped" aria-labelledby="tableLabel">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Temp. (C)</th>
-                    <th>Temp. (F)</th>
-                    <th>Summary</th>
-                </tr>
-            </thead>
-            <tbody>
-                {forecasts.map(forecast =>
-                    <tr key={forecast.date}>
-                        <td>{forecast.date}</td>
-                        <td>{forecast.temperatureC}</td>
-                        <td>{forecast.temperatureF}</td>
-                        <td>{forecast.summary}</td>
-                    </tr>
-                )}
-            </tbody>
-        </table>;
-
-    return (
-        <div>
-            <h1 id="tableLabel">Weather forecast</h1>
-            <p>This component demonstrates fetching data from the server.</p>
-            {contents}
+    const renderMainMenu = () => (
+        <div className="menu">
+            <h1>Card Games</h1>
+            <button onClick={() => { setAuthMode('login'); setScreen('solitaireAuth'); }}>Solitaire</button>
+            <button onClick={() => { setAuthMode('login'); setScreen('blackjackAuth'); }}>Blackjack</button>
         </div>
     );
-    
-    async function populateWeatherData() {
-        const response = await fetch('weatherforecast');
-        if (response.ok) {
-            const data = await response.json();
-            setForecasts(data);
-        }
-    }
+
+    const renderAuthScreen = (game) => (
+        <div className="auth">
+            <div className="back-arrow" onClick={() => setScreen('main')}>&larr;</div>
+            <h2>{authMode === 'login' ? 'Login' : 'Create Account'}</h2>
+            <input type="text" placeholder="Username" />
+            <input type="password" placeholder="Password" />
+            <button>{authMode === 'login' ? 'Login' : 'Create Account'}</button>
+            <div className="auth-toggle">
+                <span className="auth-link" onClick={() => setAuthMode(authMode === 'login' ? 'create' : 'login')}>
+                    {authMode === 'login' ? 'Create Account' : 'Log In'}
+                </span>
+            </div>
+        </div>
+    );
+
+    return (
+        <div className="app-container">
+            {screen === 'main' && renderMainMenu()}
+            {screen === 'solitaireAuth' && renderAuthScreen('solitaire')}
+            {screen === 'blackjackAuth' && renderAuthScreen('blackjack')}
+            {screen === 'blackjackPlayer2' && renderAuthScreen('blackjack')}
+        </div>
+    );
 }
 
 export default App;
