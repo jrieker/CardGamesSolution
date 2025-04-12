@@ -1,3 +1,5 @@
+using CardGamesSolution.Server.Shared;
+
 namespace CardGamesSolution.Server.Solitaire {
     public class MoveRequest {
         public Card Card { get; set; }
