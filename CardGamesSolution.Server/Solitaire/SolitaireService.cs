@@ -1,4 +1,4 @@
-namespace CardGamesSolution.Server.UserAccount {
+namespace CardGamesSolution.Server.Solitaire {
     public class SolitaireService {
         private readonly ISolitaireManager manager;
         private readonly ISolitaireEngine engine;

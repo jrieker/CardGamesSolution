@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SolitaireEngine {
+namespace CardGamesSolution.Server.Solitaire {
     public class SolitaireEngine : ISolitaireEngine {
         private GameState gameState = new GameState();
 

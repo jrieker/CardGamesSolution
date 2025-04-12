@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SolitaireEngine {
+namespace CardGamesSolution.Server.Solitaire {
     public class GameState {
         public List<TableauPile> Tableau { get; set; }
         public Dictionary<string, List<Card>> Foundation { get; set; }

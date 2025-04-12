@@ -1,4 +1,4 @@
-namespace SolitaireEngine {
+namespace CardGamesSolution.Server.Solitaire {
     public class MoveResult {
         public bool IsValid { get; set; }
         public string Message { get; set; }

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SolitaireEngine {
+namespace CardGamesSolution.Server.Solitaire {
     public interface ISolitaireAccessor {
         List<Card> GetCards();
         Dictionary<string, string> GetCardImages();

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SolitaireEngine {
+namespace CardGamesSolution.Server.Solitaire {
     public class SolitaireAccessor : ISolitaireAccessor {
         public List<Card> GetCards() {
             var cards = new List<Card>();

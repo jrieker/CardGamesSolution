@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SolitaireEngine {
+namespace CardGamesSolution.Server.Solitaire {
     public class TableauPile {
         public List<Card> FaceDown { get; set; } = new List<Card>();
         public List<Card> FaceUp { get; set; } = new List<Card>();

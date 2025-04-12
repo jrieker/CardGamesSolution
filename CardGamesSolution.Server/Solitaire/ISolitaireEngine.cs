@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SolitaireEngine {
+namespace CardGamesSolution.Server.Solitaire {
     public interface ISolitaireEngine {
         void InitializeGame(List<Card> cards);
         MoveResult ProcessMove(Card card, string fromPile, string toPile);

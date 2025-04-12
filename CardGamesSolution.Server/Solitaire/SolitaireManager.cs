@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SolitaireEngine {
+namespace CardGamesSolution.Server.Solitaire {
     public class SolitaireManager : ISolitaireManager {
         private ISolitaireEngine engine;
         private Deck deck;

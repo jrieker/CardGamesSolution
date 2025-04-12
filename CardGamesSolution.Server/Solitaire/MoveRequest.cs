@@ -1,4 +1,4 @@
-namespace SolitaireEngine {
+namespace CardGamesSolution.Server.Solitaire {
     public class MoveRequest {
         public Card Card { get; set; }
         public string FromPile { get; set; }
