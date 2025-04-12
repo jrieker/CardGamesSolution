@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using CardGamesSolution.Server.Shared;
+
 
 namespace CardGamesSolution.Server.Solitaire {
     public interface ISolitaireAccessor {
