@@ -1,3 +1,5 @@
+using CardGamesSolution.Server.Shared;
+
 namespace CardGamesSolution.Server.Solitaire {
     public class SolitaireService {
         private readonly ISolitaireManager manager;
