@@ -4,7 +4,7 @@ namespace CardGamesSolution.Server.Solitaire {
         private readonly ISolitaireEngine engine;
 
         public SolitaireService() {
-            engine = new SolitaireEngine.SolitaireEngine();
+            engine = new SolitaireEngine();
             manager = new SolitaireManager(engine);
         }
 

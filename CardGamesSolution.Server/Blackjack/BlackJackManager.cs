@@ -1,4 +1,5 @@
 ﻿using CardGamesSolution.Server.Shared;
+using CardGamesSolution.Server.UserAccount;
 using System.Numerics;
 
 namespace CardGamesSolution.Server.Blackjack
@@ -21,7 +22,7 @@ namespace CardGamesSolution.Server.Blackjack
 
     //Reads in the user information from the players list
     foreach (User user in Users) {
-        players[i] = new Player(user.UserID, user.Username, user.Balance);
+        players[i] = new Player(user.UserId, user.Username, user.Balance);
         i++;
     }
 
