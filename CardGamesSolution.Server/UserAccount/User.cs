@@ -1,11 +1,9 @@
-﻿using System;
-using Microsoft.Data.SqlClient;
-
-namespace CardGamesSolution.Server.UserAccount
+﻿namespace CardGamesSolution.Server.UserAccount
 {
     public class User : IUserAccessor
     {
         // Properties
+        public int UserId { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
         public int Wins { get; set; }
@@ -15,6 +13,7 @@ namespace CardGamesSolution.Server.UserAccount
         //Constructors
         public User(string username, string password)
         {
+            this.UserId = 0;
             this.Username = username;
             this.Password = password;
             this.Wins = 0;
@@ -22,8 +21,9 @@ namespace CardGamesSolution.Server.UserAccount
             this.Balance = 0f;
         }
 
-        public User(string username, string password, int wins, int losses, float balance)
+        public User(int userId, string username, string password, int wins, int losses, float balance)
         {
+            this.UserId = userId;
             this.Username = username;
             this.Password = password;
             this.Wins = wins;
@@ -50,23 +50,6 @@ namespace CardGamesSolution.Server.UserAccount
         public void AddLoss()
         {
             this.Losses++;
-        }
-
-        public void TestDatabaseConnection()
-        {
-            string connString="Data Source=localhost,1433;Initial Catalog=master;User ID=sa;Password=SuperSecure123;TrustServerCertificate=true";
-            Console.WriteLine("Getting Connection ...");
-            SqlConnection conn = new SqlConnection(connString);
-            try
-            {
-            Console.WriteLine("Openning Connection ...");
-            conn.Open();
-            Console.WriteLine("Connection successful!");
-            }
-            catch (Exception e)
-            {
-            Console.WriteLine("Error: " + e.Message);
-            }
         }
     }
 }

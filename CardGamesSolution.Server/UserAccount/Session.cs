@@ -1,5 +1,5 @@
 ﻿using CardGamesSolution.Server;
-using SolitaireEngine;
+using CardGamesSolution.Server.Solitaire;
 
 namespace CardGamesSolution.Server.UserAccount
 {
@@ -37,9 +37,12 @@ namespace CardGamesSolution.Server.UserAccount
                 case "1":
                 case "solitaire":
                     Console.WriteLine("Starting Solitaire...\n");
-                    ISolitaireEngine solitaireEngine = new SolitaireEngine.SolitaireEngine();
-                    ISolitaireManager solitaireManager = new SolitaireManager(solitaireEngine);
-                    solitaireManager.StartNewGame();
+                    ISolitaireEngine engine = new SolitaireEngine();
+                    ISolitaireManager manager = new SolitaireManager (engine);
+                    manager.StartNewGame();
+                    GameState state = engine. GetGameState();
+                    SolitaireService game = new SolitaireService();
+                    game.StartGame ();
                     break;
 
                 case "2":
@@ -50,7 +53,7 @@ namespace CardGamesSolution.Server.UserAccount
                         string response = Console.ReadLine() ?? string.Empty.Trim().ToLower();
                         if (response == "yes")
                         {
-                            users.Add(LoginManager.Login());
+                            //users.Add(LoginManager.Login());
                         } 
                         else if (response == "no")
                         {
