@@ -2,7 +2,6 @@
 {
     public interface IUserAccessor
     {
-        void SaveStats();
         void UpdateBalance(float amount);
         void AddWin();
         void AddLoss();

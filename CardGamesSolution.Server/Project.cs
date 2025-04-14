@@ -1,28 +1,43 @@
 using CardGamesSolution.Server.UserAccount;
+using CardGamesSolution.Server.Database;
 
 class Project {
     static void Main(string[] args) {
-        Session session = new Session();
-        bool loggedIn = false;
-        User primaryUser = null;
-        while (!loggedIn)
+        IDatabaseConnection databaseConnection = new DatabaseConnection();
+        IUserDataAccessor userDataAccessor = new UserDataAccessor(databaseConnection);
+        Session session = new Session(userDataAccessor);
+        ILoginManager loginManager = new LoginManager(userDataAccessor);
+        //User Nick = userDataAccessor.GetUserByUsername("Nick");
+        //Console.WriteLine(Nick.Password);
+        
+        //terminal input for testing
+        Console.Write("Username: ");
+        string username = (Console.ReadLine() ?? string.Empty).Trim();
+        Console.Write("Password: ");
+        string password = (Console.ReadLine() ?? string.Empty).Trim();
+
+        try
         {
-            Console.WriteLine("=== LOGIN ===");
-            Console.Write("Username: ");
-            string username = Console.ReadLine() ?? string.Empty.Trim();
-            Console.Write("Password: ");
-            string password = Console.ReadLine() ?? string.Empty.Trim();
-            try
-            {
-                primaryUser = LoginManager.Login(username, password);
-                loggedIn = true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Login failed: " + e.Message);
-            }
+            loginManager.Login(username, password);
         }
-        session.AddUser(primaryUser);
-        session.StartGame();
+        catch (Exception e)
+        {
+            Console.Write("Login Failed: " + e.Message);
+        }
+
+        //terminal input for testing
+        Console.Write("Username: ");
+        username = (Console.ReadLine() ?? string.Empty).Trim();
+        Console.Write("Password: ");
+        password = (Console.ReadLine() ?? string.Empty).Trim();
+
+        try
+        {
+            loginManager.Register(username, password);
+        }
+        catch (Exception e)
+        {
+            Console.Write("Login Failed: " + e.Message);
+        }
     }
 }

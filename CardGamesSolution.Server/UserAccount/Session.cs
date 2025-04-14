@@ -1,5 +1,6 @@
-﻿using CardGamesSolution.Server;
-using CardGamesSolution.Server.Solitaire;
+﻿using CardGamesSolution.Server.Solitaire;
+using CardGamesSolution.Server.Blackjack;
+using CardGamesSolution.Server.Database;
 
 namespace CardGamesSolution.Server.UserAccount
 {
@@ -8,6 +9,12 @@ namespace CardGamesSolution.Server.UserAccount
     {
         // List to store active users in the session
         private List<User> users = new List<User>();
+        private IUserDataAccessor userDataAccessor;
+
+        public Session(IUserDataAccessor userDataAccessor)
+        {
+            this.userDataAccessor = userDataAccessor;
+        }
 
         public void AddUser(User user)
         {
@@ -16,7 +23,6 @@ namespace CardGamesSolution.Server.UserAccount
 
         public void RemoveUser(User user)
         {
-            user.SaveStats();
             users.Remove(user);
         }
 
@@ -40,7 +46,7 @@ namespace CardGamesSolution.Server.UserAccount
                     ISolitaireEngine engine = new SolitaireEngine();
                     ISolitaireManager manager = new SolitaireManager (engine);
                     manager.StartNewGame();
-                    GameState state = engine. GetGameState();
+                    GameState state = engine.GetGameState();
                     SolitaireService game = new SolitaireService();
                     game.StartGame ();
                     break;
@@ -72,7 +78,7 @@ namespace CardGamesSolution.Server.UserAccount
                     Console.WriteLine("Exiting the game. Goodbye!");
                     foreach (User u in users)
                     {
-                        u.SaveStats();
+                        userDataAccessor.SaveUserData(u);
                     }
                     return;
 

@@ -11,9 +11,9 @@
         public float Balance { get; set; }
 
         //Constructors
-        public User(string username, string password)
+        public User(int userId, string username, string password)
         {
-            this.UserId = 0;
+            this.UserId = userId;
             this.Username = username;
             this.Password = password;
             this.Wins = 0;
@@ -32,11 +32,6 @@
         }
 
         // Method placeholders
-        public void SaveStats()
-        {
-            // TODO: Save user stats to database
-        }
-
         public void UpdateBalance(float amount)
         {
             this.Balance += amount;

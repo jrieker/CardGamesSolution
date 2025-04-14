@@ -1,27 +1,52 @@
-﻿namespace CardGamesSolution.Server.UserAccount
+﻿using CardGamesSolution.Server.Database;
+
+namespace CardGamesSolution.Server.UserAccount
 {
     
-    public class LoginManager
+    public class LoginManager : ILoginManager
     {
-        public static User Login(string username, string password)
+        private readonly IUserDataAccessor userDataAccessor;
+
+        public LoginManager(IUserDataAccessor userDataAccessor)
+        {
+            this.userDataAccessor = userDataAccessor;
+        }
+        public User Login(string username, string password)
         {
             Console.WriteLine("\nLogging in...\n");
-            User user = DatabaseConnection.GetUserFromUsername(username);
-
-            if (user.Password == password) 
+            if (userDataAccessor.UserExists(username))
             {
-                Console.WriteLine("Logged in as " + username + "\n");
-                return user;
+                User user = userDataAccessor.GetUserByUsername(username);
+
+                if (user.Password == password) 
+                {
+                    Console.WriteLine("Logged in as " + username + "\n");
+                    return user;
+                }
+                else
+                {
+                    throw new Exception("Incorrect password!");
+                } 
             }
             else
-            {
-                throw new Exception("Incorrect password!");
-            }  
+                {
+                    throw new Exception("Username not found!");
+                } 
+             
         }
 
         public void Register(string username, string password)
         {
-            // TODO: Create new user and save to database
+            if (!userDataAccessor.UserExists(username))
+            {
+                int userId = userDataAccessor.GetNextUserId();
+                User u = new User(userId, username, password);
+                userDataAccessor.SaveUserData(u);
+            }
+            else
+            {
+                throw new Exception("User already exists!");
+            }
         }
     }
 }
