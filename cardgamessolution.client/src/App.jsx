@@ -19,7 +19,36 @@ function App() {
             <h2>{game === 'solitaire' ? 'Solitaire' : 'Blackjack'}</h2>
             <input type="text" placeholder="Username" />
             <input type="password" placeholder="Password" />
-            <button className="auth-button">{authMode === 'login' ? 'Login' : 'Create Account'}</button>
+            <button
+                className="auth-button"
+                onClick={async () => {
+                    const username = document.querySelector('input[placeholder="Username"]').value;
+                    const password = document.querySelector('input[placeholder="Password"]').value;
+
+                    const endpoint = authMode === 'login' ? 'login' : 'register';
+
+                    try {
+                        const response = await fetch(`/api/user/${endpoint}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ username, password })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            alert(`${authMode === 'login' ? 'Logged in' : 'Account created'} successfully!`);
+                        } else {
+                            alert(result.message || 'Failed. Please try again.');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('Server error. See console.');
+                    }
+                }}
+            >
+                {authMode === 'login' ? 'Login' : 'Create Account'}
+            </button>
             <div className="auth-toggle">
                 <span className="auth-link" onClick={() => setAuthMode(authMode === 'login' ? 'create' : 'login')}>
                     {authMode === 'login' ? 'Need an account? Create one' : 'Already have an account? Log in'}
