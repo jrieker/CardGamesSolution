@@ -1,4 +1,4 @@
-﻿namespace CardGamesSolution.Server.Shared
+namespace CardGamesSolution.Server.Shared
 {
     /// <summary>
     /// Represents a single card with a suit and a number.
@@ -25,6 +25,26 @@
         {
             Suit = suit;
             Number = number;
+        }
+
+        /// <summary>
+        /// Returns true if the card is a red suit (Hearts or Diamonds).
+        /// </summary>
+        public bool IsRed() {
+            return Suit == "Hearts" || Suit == "Diamonds";
+        }
+
+        /// <summary>
+        /// Returns the rank symbol of the card ("A", "J", "Q", "K", or number).
+        /// </summary>
+        public string GetRank() {
+            return Number switch {
+                1 => "A",
+                11 => "J",
+                12 => "Q",
+                13 => "K",
+                _ => Number.ToString()
+            };
         }
     }
 }
