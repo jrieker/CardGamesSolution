@@ -13,9 +13,10 @@ namespace CardGamesSolution.Tests
             string password = "testPass";
 
             // Act
-            User user = new User(username, password);
+            User user = new User(7, username, password);
 
             // Assert
+            Assert.AreEqual(7, user.UserId);
             Assert.AreEqual(username, user.Username);
             Assert.AreEqual(password, user.Password);
             Assert.AreEqual(0, user.Wins);
@@ -27,6 +28,7 @@ namespace CardGamesSolution.Tests
         public void Constructor_WithFullParams()
         {
             // Arrange
+            int userId = 8;
             string username = "existingUser";
             string password = "pass123";
             int wins = 5;
@@ -34,9 +36,10 @@ namespace CardGamesSolution.Tests
             float balance = 200;
 
             // Act
-            User user = new User(username, password, wins, losses, balance);
+            User user = new User(userId, username, password, wins, losses, balance);
 
             // Assert
+            Assert.AreEqual(userId, user.UserId);
             Assert.AreEqual(username, user.Username);
             Assert.AreEqual(password, user.Password);
             Assert.AreEqual(wins, user.Wins);
@@ -48,7 +51,7 @@ namespace CardGamesSolution.Tests
         public void UpdateBalance_Sets()
         {
             // Arrange
-            User user = new User("test", "pass");
+            User user = new User(1, "test", "pass");
             float amount = 50.75f;
 
             // Act
@@ -62,7 +65,7 @@ namespace CardGamesSolution.Tests
         public void UpdateBalance_Adds()
         {
             // Arrange
-            User user = new User("test", "pass", 0, 0, 15.5f);
+            User user = new User(0, "test", "pass", 0, 0, 15.5f);
             float amount = 20.5f;
 
             // Act
@@ -76,7 +79,7 @@ namespace CardGamesSolution.Tests
         public void UpdateBalance_Subtracts()
         {
             // Arrange
-            User user = new User("test", "pass", 0, 0, 12.2f);
+            User user = new User(0, "test", "pass", 0, 0, 12.2f);
             float amount = -1.3f;
 
             // Act
@@ -90,7 +93,7 @@ namespace CardGamesSolution.Tests
         public void AddWin_IncrementsWinsByOne()
         {
             // Arrange
-            User user = new User("test", "pass");
+            User user = new User(0, "test", "pass");
             user.Wins = 2;
 
             // Act
@@ -104,7 +107,7 @@ namespace CardGamesSolution.Tests
         public void AddLoss_IncrementsLossesByOne()
         {
             // Arrange
-            User user = new User("test", "pass");
+            User user = new User(0, "test", "pass");
             user.Losses = 1;
 
             // Act

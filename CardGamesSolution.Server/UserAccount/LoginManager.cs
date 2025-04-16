@@ -13,14 +13,12 @@ namespace CardGamesSolution.Server.UserAccount
         }
         public User Login(string username, string password)
         {
-            Console.WriteLine("\nLogging in...\n");
             if (userDataAccessor.UserExists(username))
             {
                 User user = userDataAccessor.GetUserByUsername(username);
 
                 if (user.Password == password) 
                 {
-                    Console.WriteLine("Logged in as " + username + "\n");
                     return user;
                 }
                 else
