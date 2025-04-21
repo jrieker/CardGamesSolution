@@ -25,6 +25,7 @@ namespace CardGamesSolution.Server.UserAccount
         public void RemoveUser(User user)
         {
             if (users.Contains(user)) {
+                userDataAccessor.SaveUserData(user);
                 users.Remove(user);
             }
         }

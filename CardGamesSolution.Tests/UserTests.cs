@@ -6,7 +6,7 @@ namespace CardGamesSolution.Tests
     public class UserTests
     {
         [TestMethod]
-        public void Constructor_WithBasicParams()
+        public void Constructor_BasicParams()
         {
             // Arrange
             string username = "testUser";
@@ -25,7 +25,7 @@ namespace CardGamesSolution.Tests
         }
 
         [TestMethod]
-        public void Constructor_WithFullParams()
+        public void Constructor_FullParams()
         {
             // Arrange
             int userId = 8;
@@ -90,7 +90,7 @@ namespace CardGamesSolution.Tests
         }
 
         [TestMethod]
-        public void AddWin_IncrementsWinsByOne()
+        public void AddWin_IncrementsWins()
         {
             // Arrange
             User user = new User(0, "test", "pass");
@@ -104,7 +104,7 @@ namespace CardGamesSolution.Tests
         }
 
         [TestMethod]
-        public void AddLoss_IncrementsLossesByOne()
+        public void AddLoss_IncrementsLosses()
         {
             // Arrange
             User user = new User(0, "test", "pass");

@@ -47,7 +47,7 @@ namespace CardGamesSolution.Tests
         }
 
         [TestMethod]
-        public void RemoveUser_DoesNotThrow_WhenUserNotInList()
+        public void RemoveUser_InvalidUser()
         {
             // Arrange
             var user = new User(3, "ghost", "pass");
