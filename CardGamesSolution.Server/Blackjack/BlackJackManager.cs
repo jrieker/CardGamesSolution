@@ -1,143 +1,229 @@
 ﻿using CardGamesSolution.Server.Shared;
 using CardGamesSolution.Server.UserAccount;
-using System.Numerics;
+using Microsoft.SqlServer.Server;
+
 
 namespace CardGamesSolution.Server.Blackjack
 {
     public class BlackJackManager
     {
         private IBlackJackEngine BlackJackEngine;
+        private Player[] players = Array.Empty<Player>();
+        private Deck deck = null;
+        private Hand dealerHand = null;
+        private int currentPlayerIndex;
+        private bool isRoundOver;
+                            
 
         public BlackJackManager(IBlackJackEngine engine)
         {
             BlackJackEngine = engine;
         }
 
-    //Added intialize
-    public void Intialize(User[] Users)
-    {   
-        int length = Users.Length;
-        Player[] players = new Player[length];
-        int i = 0;
+        //Returns the updated gamestae of the current game
+        public MultiplayerGameState MapToGameState() 
+        {
+            //Creates empty playerDto list
+            PlayerDto[] playersDTOs = new PlayerDto[players.Length];
 
-    //Reads in the user information from the players list
-    foreach (User user in Users) {
-        players[i] = new Player(user.UserId, user.Username, user.Balance);
-        i++;
-    }
+            //Goes through each player and turns them into a DTO
+            for (int i = 0; i < players.Length; i++)
+            {
+                var player = players[i];
 
-    Deck startingDeck = new Deck();
-    Hand startingHand = new Hand(startingDeck);
+                // Build the HandDto
+                var tempCards = new List<CardDto>();
+                foreach (var card in player.PlayerHand.getCards())
+                    tempCards.Add(new CardDto(card.Suit, card.Number));
 
-    Hand dealersHand = new Hand(startingDeck);
+                var tempHandDto = new HandDto(
+                    tempCards,
+                    player.PlayerHand.valueOfHand()
+                );
 
-    //Starts the game
-    StartGame(players, dealersHand, startingDeck);
+                // Populate the PlayerDto
+                playersDTOs[i] = new PlayerDto(
+                    player.PlayerId,
+                    tempHandDto,
+                    player.BetValue,
+                    player.HasPlacedBet,
+                    player.HasStood,
+                    player.IsBusted,
+                    player.Outcome
+                );
+            }
 
 
-}
 
+            //Creates a dealers card list and cardDTO
+            List<CardDto> dealerCards = new List<CardDto>();
+            foreach (var card in dealerHand.getCards())
+            {
+                dealerCards.Add(new CardDto(card.Suit, card.Number));
+            }
 
+            //Creates handDTO
+            HandDto dealerHandDto = new HandDto(
+                dealerCards,
+                dealerHand.valueOfHand()
+            );
+
+            //Returns a new mu
+            return new MultiplayerGameState
+                (
+                    playersDTOs,
+                    dealerHandDto,
+                    currentPlayerIndex,
+                    isRoundOver
+                );
+
+        }
+
+        //Intializes the game
+        public MultiplayerGameState Intialize(User[] users)
+        {
+
+            players = new Player[users.Length];
+            for (int i = 0; i < users.Length; i++)
+            {
+                User user = users[i];
+                players[i] = new Player(user.UserId, user.Username, user.Balance);
+            }
+
+            deck = new Deck();
+            isRoundOver = false;
         
-        public void StartGame(Player[] players, Hand dealersHand, Deck deck)
-        {
-            BlackJackEngine.DealHands(players, dealersHand, deck);
-            PlaceBets(players);
-            foreach (Player player in players)
-            {
-                dealersHand.printHand();
-                Console.WriteLine($"\n {player.GetPlayerName()}'s Turn --");
-                Turn(player, deck);
-            }
+            BlackJackEngine.DealHands(players, dealerHand, deck);
 
-            BlackJackEngine.PlayDealer(dealersHand, deck);
+            currentPlayerIndex = 0;
+            isRoundOver = false;
 
-            Payout(players, dealersHand);
-        }
-
-        public void PlaceBets(Player[] players)
-        {
-            foreach (Player player in players)
-            {
-                Console.Write($"{player.GetPlayerName()}, enter an amount to wager: ");
-                string input = Console.ReadLine();
-                if (float.TryParse(input, out float amount) && amount > 0)
-                {
-                    player.SetBetValue(amount);
-                }
-                else
-                {
-                    Console.WriteLine($"{player.GetPlayerName}, Invalid bet. Setting bet to 0.");
-                    player.SetBetValue(0);
-                }
-            }
-        }
-
-        public void Payout(Player[] players, Hand dealersHand)
-        {
-            int dealersHandValue = dealersHand.valueOfHand();
-
-
-            foreach (Player player in players)
-            {
-                int playerValue = player.GetPlayerHand().valueOfHand();
-                float bet = player.GetBetValue();
-                float payout = BlackJackEngine.ComputePayout(playerValue, dealersHandValue, bet);
-
-                string result;
-
-                if (payout > 0)
-                {
-                    result = $"You won {payout}";
-                }
-                else
-                {
-                    payout = Math.Abs(payout);
-                    result = $"You lost {payout}";
-                }
-
-                Console.WriteLine($"{player.GetPlayerName()} ({playerValue}) {result}");
-            }
-
+            return MapToGameState();
 
         }
-        public void Turn(Player player, Deck deck)
+
+        public ActionResultDto PlaceBet(BetCommandDto command)
         {
-            var hand = player.GetPlayerHand();
-            while (true)
+            //finds the player in the list that matches the players command ID
+            Player player = players.FirstOrDefault(p => p.PlayerId == command.PlayerId);
+
+            if (player == null) 
             {
-
-                Console.WriteLine($"{player.GetPlayerName()} hand value: {hand.valueOfHand()} \n");
-                player.GetPlayerHand().printHand();
-
-                //Busted
-                if (hand.valueOfHand() > 21)
-                {
-                    Console.WriteLine($"{player.GetPlayerName()} busted");
-                    break;
-                }
-
-                //Gets Input
-                Console.Write($"{player.GetPlayerName()}, Hit or Stay? (H/S): ");
-                var input = Console.ReadLine().Trim().ToLower();
-
-
-                //Evaulates Options
-                if (input == "h")
-                {
-                    int newVal = BlackJackEngine.Hit(hand, deck);
-                    Console.WriteLine($"{player.GetPlayerName()} drew. New value: {newVal}");
-                }
-                else if (input == "s")
-                {
-                    Console.WriteLine("You stay.");
-                    break;
-                }
-                else
-                {
-                    Console.WriteLine("Invalid choice.");
-                }
+                return new ActionResultDto(false, $"Player {command.PlayerId} not found");
             }
+
+            try
+            {
+                player.PlaceBet(command.Amount);
+                return new ActionResultDto(true, "Bet placed");
+            }
+            catch (Exception ex)
+            {
+                return new ActionResultDto(false, ex.Message);
+            }
+
         }
+
+        public ActionResultDto Hit(HitCommandDto cmd)
+        {
+            Player player = players.FirstOrDefault(p => p.PlayerId == cmd.PlayerId);
+
+            if (player == null)
+            {
+                return new ActionResultDto(false, "Player not found");
+            }
+            if (player.PlayerId != players[currentPlayerIndex].PlayerId)
+            {
+                return new ActionResultDto(false, "Not your turn");
+            }
+
+            int total = BlackJackEngine.Hit(player.PlayerHand, deck);
+
+            if (total > 21) {
+                player.Outcome = WinnerType.Dealer;
+            }
+
+            if (player.IsBusted)
+                AdvanceTurn();
+
+            return new ActionResultDto(true, $"Drew Card, new total = {total}");
+        }
+
+        public ActionResultDto Stand(StandCommandDto command)
+        {
+            Player player = players.FirstOrDefault(p => p.PlayerId == command.PlayerId);
+
+            if (player == null)
+            {
+                return new ActionResultDto(false, "Player not found");
+            }
+
+            if (player.PlayerId != players[currentPlayerIndex].PlayerId)
+            {
+                return new ActionResultDto(false, "Not your turn");
+            }
+            
+            player.HasStood = true;
+            AdvanceTurn();
+            return new ActionResultDto(true, "Player stood");
+        }
+
+        private void AdvanceTurn() 
+        {
+            bool someoneStillToAct = players.Any(p => !p.HasStood && !p.IsBusted);
+
+            //Updates player loop, uses remainder to keep looping continously
+            int next = (currentPlayerIndex + 1) % players.Length;
+
+            if (someoneStillToAct)
+            {
+                 
+                int nextIndex = (currentPlayerIndex + 1) % players.Length;
+
+                //Searches for player who hasn't busted or stood
+                while (players[nextIndex].HasStood || players[nextIndex].IsBusted)
+                {
+                    nextIndex = (nextIndex + 1) % players.Length;
+                }
+                currentPlayerIndex = nextIndex;
+            }
+            else
+            {
+                //Gets dealers total
+                int dealerTotal = BlackJackEngine.PlayDealer(dealerHand, deck);   
+
+                //Goes through each player and calculates if they won or not
+                foreach (Player player in players)
+                {
+                    int playerTotal = player.PlayerHand.valueOfHand();
+                    float payout = BlackJackEngine.ComputePayout(playerTotal, dealerTotal, player.BetValue);  
+
+                    // Update balance and set Outcome
+                    player.UpdateBalance(payout);
+                    player.BetValue = 0;
+
+                    if (payout > 0) 
+                    {
+                        player.Outcome = WinnerType.Player;
+                    }
+                    else if(payout < 0)
+                    {
+                        player.Outcome = WinnerType.Dealer;
+                    }
+                    else
+                    {
+                        player.Outcome = WinnerType.Push;
+                    }
+
+                    
+
+                }
+
+                //end round
+                isRoundOver = true;
+            }
+
+        }
+
     }
 }

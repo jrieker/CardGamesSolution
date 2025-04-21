@@ -14,6 +14,8 @@ namespace CardGamesSolution.Server.Blackjack
                 Hand newHand = new Hand(cardOne, cardTwo);
                 player.SetPlayerHand(newHand);
             }
+           
+            dealerHand.SetCards();
             dealerHand.AddCard(deck.Draw());
             dealerHand.AddCard(deck.Draw());
         }

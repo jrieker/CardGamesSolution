@@ -12,6 +12,11 @@ namespace CardGamesSolution.Server.Blackjack
             Cards.Add(CardTwo);
         }
 
+        public Hand()
+        {
+            Cards = new List<Card>();
+        }
+
         public Hand(Deck deck)
         {
             Card cardOne = deck.Draw();
@@ -84,6 +89,11 @@ namespace CardGamesSolution.Server.Blackjack
             return total;
 
 
+        }
+
+        public void clearHand()
+        {
+            this.Cards = new List<Card>();
         }
 
     }
