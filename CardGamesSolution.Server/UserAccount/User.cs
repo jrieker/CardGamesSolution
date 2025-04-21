@@ -9,6 +9,7 @@
         public int Wins { get; set; }
         public int Losses { get; set; }
         public float Balance { get; set; }
+        public int GamesPlayed { get; set; }
 
         //Constructors
         public User(int userId, string username, string password)
@@ -19,9 +20,10 @@
             this.Wins = 0;
             this.Losses = 0;
             this.Balance = 0f;
+            this.GamesPlayed = 0;
         }
 
-        public User(int userId, string username, string password, int wins, int losses, float balance)
+        public User(int userId, string username, string password, int wins, int losses, float balance, int gamesPlayed)
         {
             this.UserId = userId;
             this.Username = username;
@@ -29,6 +31,7 @@
             this.Wins = wins;
             this.Losses = losses;
             this.Balance = balance;
+            this.GamesPlayed = gamesPlayed;
         }
 
         // Method placeholders

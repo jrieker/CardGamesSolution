@@ -22,6 +22,7 @@ namespace CardGamesSolution.Tests
             Assert.AreEqual(0, user.Wins);
             Assert.AreEqual(0, user.Losses);
             Assert.AreEqual(0f, user.Balance);
+            Assert.AreEqual(0, user.GamesPlayed);
         }
 
         [TestMethod]
@@ -34,9 +35,10 @@ namespace CardGamesSolution.Tests
             int wins = 5;
             int losses = 3;
             float balance = 200;
+            int gamesPlayed = 15;
 
             // Act
-            User user = new User(userId, username, password, wins, losses, balance);
+            User user = new User(userId, username, password, wins, losses, balance, gamesPlayed);
 
             // Assert
             Assert.AreEqual(userId, user.UserId);
@@ -45,6 +47,7 @@ namespace CardGamesSolution.Tests
             Assert.AreEqual(wins, user.Wins);
             Assert.AreEqual(losses, user.Losses);
             Assert.AreEqual(balance, user.Balance);
+            Assert.AreEqual(15, user.GamesPlayed);
         }
 
         [TestMethod]
@@ -65,7 +68,7 @@ namespace CardGamesSolution.Tests
         public void UpdateBalance_Adds()
         {
             // Arrange
-            User user = new User(0, "test", "pass", 0, 0, 15.5f);
+            User user = new User(0, "test", "pass", 0, 0, 15.5f, 0);
             float amount = 20.5f;
 
             // Act
@@ -79,7 +82,7 @@ namespace CardGamesSolution.Tests
         public void UpdateBalance_Subtracts()
         {
             // Arrange
-            User user = new User(0, "test", "pass", 0, 0, 12.2f);
+            User user = new User(0, "test", "pass", 0, 0, 12.2f, 0);
             float amount = -1.3f;
 
             // Act

@@ -29,7 +29,8 @@ namespace CardGamesSolution.Server.Database
                         int wins = (int)reader["wins"];
                         int losses = (int)reader["losses"];
                         float balance = Convert.ToSingle(reader["balance"]);
-                        user = new User(userId, username, password, wins, losses, balance);
+                        int gamesPlayed = (int)reader["gamesPlayed"];
+                        user = new User(userId, username, password, wins, losses, balance, gamesPlayed);
                     }
                 }
             }
@@ -50,10 +51,11 @@ namespace CardGamesSolution.Server.Database
                                                 passWord = @passWord,
                                                 balance = @balance,
                                                 wins = @wins,
-                                                losses = @losses
+                                                losses = @losses,
+                                                gamesPlayed = @gamesPlayed
                                         WHEN NOT MATCHED THEN
                                             INSERT (UserId, userName, passWord, balance, wins, losses, gamesPlayed)
-                                            VALUES (@UserId, @userName, @passWord, @balance, @wins, @losses, 0);";
+                                            VALUES (@UserId, @userName, @passWord, @balance, @wins, @losses, @gamesPlayed);";
                 using (SqlCommand command = new SqlCommand(query, conn))
                 {
                     command.Parameters.AddWithValue("@UserId", user.UserId);
@@ -62,6 +64,7 @@ namespace CardGamesSolution.Server.Database
                     command.Parameters.AddWithValue("@balance", user.Balance);
                     command.Parameters.AddWithValue("@wins", user.Wins);
                     command.Parameters.AddWithValue("@losses", user.Losses);
+                    command.Parameters.AddWithValue("@gamesPlayed", user.GamesPlayed);
                     command.ExecuteNonQuery();
                 }
             }
@@ -93,6 +96,20 @@ namespace CardGamesSolution.Server.Database
                     return nextId;
                 }
                 
+            }
+        }
+
+        public void DeleteUserByUsername(string username)
+        {
+            using (SqlConnection conn = databaseConnection.GetConnection())
+            {
+                conn.Open();
+                string query = "DELETE FROM USERS WHERE userName = @userName";
+                using (SqlCommand command = new SqlCommand(query, conn))
+                {
+                    command.Parameters.AddWithValue("@userName", username);
+                    command.ExecuteNonQuery();
+                }
             }
         }
     }

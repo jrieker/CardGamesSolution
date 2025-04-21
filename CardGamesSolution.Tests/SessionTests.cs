@@ -6,13 +6,14 @@ namespace CardGamesSolution.Tests
     [TestClass]
     public class SessionTests
     {
+        private IDatabaseConnection databaseConnection;
         private IUserDataAccessor userDataAccessor;
         private Session session;
 
         [TestInitialize]
         public void Setup()
         {
-            IDatabaseConnection databaseConnection = new DatabaseConnection(); 
+            databaseConnection = new DatabaseConnection(); 
             userDataAccessor = new UserDataAccessor(databaseConnection);
             session = new Session(userDataAccessor);
         }
