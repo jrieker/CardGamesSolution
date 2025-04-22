@@ -25,11 +25,11 @@ namespace CardGamesSolution.Server.Solitaire
         }
 
         [HttpGet("state")]
-        public ActionResult<GameState> GetGameState()
+        public IActionResult GetGameState()
         {
             try
             {
-                GameState state = _service.GetState();
+                var state = _service.GetState();
                 return Ok(new { success = true, state });
             }
             catch (Exception ex)
@@ -57,8 +57,13 @@ namespace CardGamesSolution.Server.Solitaire
         {
             try
             {
-                _service.MoveCard(move.Card, move.FromPile, move.ToPile);
-                return Ok(new { success = true });
+                MoveResult result = _service.MoveCard(move.Card, move.FromPile, move.ToPile);
+                return Ok(new
+                {
+                    success = result.IsValid,
+                    message = result.Message,
+                    gameState = result.GameState
+                });
             }
             catch (Exception ex)
             {
