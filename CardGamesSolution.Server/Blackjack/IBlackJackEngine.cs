@@ -5,7 +5,7 @@ namespace CardGamesSolution.Server.Blackjack
 {
     public interface IBlackJackEngine : ICardGamesEngine
     {
-        public void DealHands(Player[] players, Hand dealerHand, Deck deck);
+        public void DealHands(List<Player> players, Hand dealerHand, Deck deck);
 
         public int Hit(Hand hand, Deck deck);
 

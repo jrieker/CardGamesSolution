@@ -10,6 +10,8 @@
         public int Losses { get; set; }
         public float Balance { get; set; }
 
+        public User() { }
+
         //Constructors
         public User(int userId, string username, string password)
         {

@@ -6,6 +6,10 @@ namespace CardGamesSolution.Server.Blackjack
     {
         private List<Card> Cards = new List<Card>();
 
+        public Hand()
+        {
+        }
+
         public Hand(Card CardOne, Card CardTwo)
         {
             Cards.Add(CardOne);
@@ -14,51 +18,41 @@ namespace CardGamesSolution.Server.Blackjack
 
         public Hand(Deck deck)
         {
-            Card cardOne = deck.Draw();
-            Card cardTwo = deck.Draw();
-
-            Cards.Add(cardOne);
-            Cards.Add(cardTwo);
+            Cards.Add(deck.Draw());
+            Cards.Add(deck.Draw());
         }
 
-        //Getters
         public List<Card> getCards()
         {
             return Cards;
         }
 
-        //Setters
         public void SetCards(List<Card> newCards)
         {
             Cards = newCards;
         }
-
-        //Methods
 
         public void AddCard(Card card)
         {
             Cards.Add(card);
         }
 
-        //Printst the cards in each hand
         public void printHand()
         {
-            Console.WriteLine($"Hand");
+            Console.WriteLine("Hand:");
             foreach (Card card in Cards)
             {
                 Console.WriteLine($"{card.Number} of {card.Suit}");
             }
-
         }
 
-        //Gets the value of the hand
         public int valueOfHand()
         {
             int total = 0;
             int numAces = 0;
+
             foreach (Card card in Cards)
             {
-
                 int value = card.Number;
 
                 if (value == 1)
@@ -75,6 +69,7 @@ namespace CardGamesSolution.Server.Blackjack
                     total += value;
                 }
             }
+
             while (total > 21 && numAces > 0)
             {
                 total -= 10;
@@ -82,9 +77,6 @@ namespace CardGamesSolution.Server.Blackjack
             }
 
             return total;
-
-
         }
-
     }
 }

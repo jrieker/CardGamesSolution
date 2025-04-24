@@ -11,9 +11,9 @@ namespace CardGamesSolution.Server.Database
         {
             this.databaseConnection = databaseConnection;
         }
+
         public User GetUserByUsername(string username)
         {
-            User user;
             using (SqlConnection conn = databaseConnection.GetConnection())
             {
                 conn.Open();
@@ -23,17 +23,22 @@ namespace CardGamesSolution.Server.Database
                     command.Parameters.AddWithValue("@userName", username);
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
-                        reader.Read();
-                        int userId = (int)reader["UserId"];
-                        string password = reader["passWord"].ToString() ?? string.Empty;
-                        int wins = (int)reader["wins"];
-                        int losses = (int)reader["losses"];
-                        float balance = Convert.ToSingle(reader["balance"]);
-                        user = new User(userId, username, password, wins, losses, balance);
+                        if (reader.Read())
+                        {
+                            int userId = (int)reader["UserId"];
+                            string password = reader["passWord"].ToString() ?? string.Empty;
+                            int wins = (int)reader["wins"];
+                            int losses = (int)reader["losses"];
+                            float balance = Convert.ToSingle(reader["balance"]);
+                            return new User(userId, username, password, wins, losses, balance);
+                        }
+                        else
+                        {
+                            throw new Exception("User not found.");
+                        }
                     }
                 }
             }
-            return user;
         }
 
         public void SaveUserData(User user)
@@ -66,6 +71,7 @@ namespace CardGamesSolution.Server.Database
                 }
             }
         }
+
         public bool UserExists(string username)
         {
             using (SqlConnection conn = databaseConnection.GetConnection())
@@ -92,7 +98,6 @@ namespace CardGamesSolution.Server.Database
                     int nextId = (int)command.ExecuteScalar();
                     return nextId;
                 }
-                
             }
         }
     }

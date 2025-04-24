@@ -21,7 +21,16 @@ namespace CardGamesSolution.Server.Controllers
             try
             {
                 User loggedInUser = _loginManager.Login(user.Username, user.Password);
-                return Ok(new { success = true, username = loggedInUser.Username });
+                return Ok(new
+                {
+                    success = true,
+                    userId = loggedInUser.UserId,
+                    username = loggedInUser.Username,
+                    password = loggedInUser.Password,
+                    balance = loggedInUser.Balance,
+                    wins = loggedInUser.Wins,
+                    losses = loggedInUser.Losses
+                });
             }
             catch (Exception ex)
             {
@@ -35,7 +44,7 @@ namespace CardGamesSolution.Server.Controllers
             try
             {
                 _loginManager.Register(user.Username, user.Password);
-                return Ok(new { success = true });
+                return Ok(new { success = true, username = user.Username });
             }
             catch (Exception ex)
             {

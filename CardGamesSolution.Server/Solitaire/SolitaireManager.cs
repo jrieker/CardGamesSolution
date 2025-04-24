@@ -15,7 +15,7 @@ namespace CardGamesSolution.Server.Solitaire {
 
         public void StartNewGame() {
             deck.Shuffle();
-            engine.InitializeGame(deck.GetCards());
+            //engine.InitializeGame(deck.GetCards());
 
             // method for starting or restarting game
         }
