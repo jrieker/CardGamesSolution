@@ -1,10 +1,9 @@
-﻿using System.Numerics;
-using CardGamesSolution.Server.Shared;
+﻿using CardGamesSolution.Server.Shared;
 using CardGamesSolution.Server.UserAccount;
 
 namespace CardGamesSolution.Server.Blackjack
 {
-    public interface IBlackJackManager : ICardGamesManager
+    public interface IBlackJackManager
     {
         MultiplayerGameState InitializeGame(User[] users);
         ActionResultDto PlaceBet(BetCommandDto cmd);

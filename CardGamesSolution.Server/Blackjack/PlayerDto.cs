@@ -1,4 +1,4 @@
-﻿namespace CardGamesSolution.Server.Blackjack
+namespace CardGamesSolution.Server.Blackjack
 {
     public class PlayerDto
     {

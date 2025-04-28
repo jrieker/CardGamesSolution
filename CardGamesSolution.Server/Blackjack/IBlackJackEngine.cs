@@ -3,7 +3,7 @@ using CardGamesSolution.Server.Shared;
 
 namespace CardGamesSolution.Server.Blackjack
 {
-    public interface IBlackJackEngine : ICardGamesEngine
+    public interface IBlackJackEngine
     {
         public void DealHands(List<Player> players, Hand dealerHand, Deck deck);
 

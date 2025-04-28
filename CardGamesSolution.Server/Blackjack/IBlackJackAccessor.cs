@@ -3,7 +3,7 @@ using CardGamesSolution.Server.Shared;
 
 namespace CardGamesSolution.Server.Blackjack
 {
-    internal interface IBlackJackAccessor : ICardGamesAccessor
+    internal interface IBlackJackAccessor
     {
         public Player LoadUserInfo(int PlayerId);
 

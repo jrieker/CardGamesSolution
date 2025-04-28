@@ -1,8 +1,9 @@
 ﻿using CardGamesSolution.Server.UserAccount;
+using CardGamesSolution.Server.Blackjack;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 
-namespace CardGamesSolution.Server.Blackjack
+namespace CardGamesSolution.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -25,8 +26,8 @@ namespace CardGamesSolution.Server.Blackjack
 
             var result = initializedPlayers.Select(p => new PlayerDto
             {
-                UserId = p.GetPlayerId(),
-                Username = p.GetPlayerName()
+                UserId = p.PlayerId,
+                Username = p.PlayerName
             }).ToList();
 
             return Ok(new
