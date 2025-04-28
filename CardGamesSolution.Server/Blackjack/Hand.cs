@@ -6,10 +6,6 @@ namespace CardGamesSolution.Server.Blackjack
     {
         private List<Card> Cards = new List<Card>();
 
-        public Hand()
-        {
-        }
-
         public Hand(Card CardOne, Card CardTwo)
         {
             Cards.Add(CardOne);
