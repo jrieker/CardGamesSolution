@@ -42,11 +42,6 @@ namespace CardGamesSolution.Server.Solitaire
             }
         }
 
-        public void Restart()
-        {
-            StartNewGame();
-        }
-
         public GameState GetGameState()
         {
             return engine.GetGameState();
