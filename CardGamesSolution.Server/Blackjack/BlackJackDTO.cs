@@ -12,16 +12,6 @@
     public record ActionResultDto(bool Success, string? Message);
 
     public enum WinnerType { Player, Dealer, Push }
-
-    //public record PlayerDto(
-    //    int PlayerId,        
-    //    HandDto Hand,        
-    //    float Bet,
-    //    bool HasPlacedBet,
-    //    bool HasStood,       
-    //    bool IsBusted,
-    //    WinnerType? Winner
-    //);
     public record MultiplayerGameState(
         PlayerDto[] Players,
         HandDto DealerHand,
