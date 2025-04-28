@@ -12,10 +12,11 @@ namespace CardGamesSolution.Server.Blackjack
                 Card cardOne = deck.Draw();
                 Card cardTwo = deck.Draw();
                 Hand newHand = new Hand(cardOne, cardTwo);
-                player.SetPlayerHand(newHand);
+                player.PlayerHand = newHand;
             }
            
-            dealerHand.SetCards();
+            // This line may not be needed
+            //dealerHand.SetCards();
             dealerHand.AddCard(deck.Draw());
             dealerHand.AddCard(deck.Draw());
         }
