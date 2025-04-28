@@ -38,7 +38,7 @@ namespace CardGamesSolution.Server.UserAccount
             {
                 int userId = userDataAccessor.GetNextUserId();
                 float startingBalance = 500;
-                User u = new User(userId, username, password, 0, 0, startingBalance);
+                User u = new User(userId, username, password, 0, 0, startingBalance, 0);
                 userDataAccessor.SaveUserData(u);
             }
             else

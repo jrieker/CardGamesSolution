@@ -14,6 +14,7 @@ namespace CardGamesSolution.Server.Database
 
         public User GetUserByUsername(string username)
         {
+            User user;
             using (SqlConnection conn = databaseConnection.GetConnection())
             {
                 conn.Open();
