@@ -1,7 +1,5 @@
 ﻿using CardGamesSolution.Server.Shared;
 using CardGamesSolution.Server.UserAccount;
-using Microsoft.SqlServer.Server;
-
 
 namespace CardGamesSolution.Server.Blackjack
 {
@@ -15,9 +13,9 @@ namespace CardGamesSolution.Server.Blackjack
         private bool isRoundOver;
                             
 
-        public BlackJackManager(IBlackJackEngine engine)
+        public BlackJackManager(BlackJackEngine engine)
         {
-            BlackJackEngine = engine;
+            _engine = engine;
         }
 
         //Returns the updated gamestae of the current game

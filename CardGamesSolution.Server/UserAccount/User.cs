@@ -11,6 +11,8 @@
         public float Balance { get; set; }
         public int GamesPlayed { get; set; }
 
+        public User() { }
+
         //Constructors
         public User(int userId, string username, string password)
         {

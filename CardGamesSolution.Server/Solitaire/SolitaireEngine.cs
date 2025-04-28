@@ -170,9 +170,9 @@ namespace CardGamesSolution.Server.Solitaire {
 
             // standard logic for moving card on top of another (number)
 
-            if (card.IsRed() == destCard.IsRed()) {
-                return new MoveResult(false, "Card must be opposite color of destination.", gameState);
-            }
+            //if (card.IsRed() == destCard.IsRed()) {
+            //    return new MoveResult(false, "Card must be opposite color of destination.", gameState);
+            //}
 
             // standard logic for moving card on top of another (rank)
 

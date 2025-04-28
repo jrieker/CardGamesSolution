@@ -11,9 +11,9 @@ namespace CardGamesSolution.Server.Database
         {
             this.databaseConnection = databaseConnection;
         }
+
         public User GetUserByUsername(string username)
         {
-            User user;
             using (SqlConnection conn = databaseConnection.GetConnection())
             {
                 conn.Open();
@@ -69,6 +69,7 @@ namespace CardGamesSolution.Server.Database
                 }
             }
         }
+
         public bool UserExists(string username)
         {
             using (SqlConnection conn = databaseConnection.GetConnection())
