@@ -5,192 +5,223 @@ namespace CardGamesSolution.Server.Blackjack
 {
     public class BlackJackManager
     {
-        private List<Player> _players = new List<Player>();
-        private Deck _deck = new Deck();
-        private Hand _dealerHand = new Hand();
-        private int currentTurnIndex = 0;
-        private readonly BlackJackEngine _engine;
-        private bool dealerSecondCardFlipped = false;
+        private IBlackJackEngine BlackJackEngine;
+        private Player[] players = Array.Empty<Player>();
+        private Deck deck = null;
+        private Hand dealerHand = null;
+        private int currentPlayerIndex;
+        private bool isRoundOver;
+                            
 
         public BlackJackManager(BlackJackEngine engine)
         {
             _engine = engine;
         }
 
-        public List<Player> Intialize(User[] users)
+        //Returns the updated gamestae of the current game
+        public MultiplayerGameState MapToGameState() 
         {
-            _players = users.Select(u => new Player(u.UserId, u.Username, u.Balance)).ToList();
+            //Creates empty playerDto list
+            PlayerDto[] playersDTOs = new PlayerDto[players.Length];
 
-            Console.WriteLine("Blackjack game started with players:");
-            foreach (var player in _players)
+            //Goes through each player and turns them into a DTO
+            for (int i = 0; i < players.Length; i++)
             {
-                Console.WriteLine($"- {player.GetPlayerName()}");
+                var player = players[i];
+
+                // Build the HandDto
+                var tempCards = new List<CardDto>();
+                foreach (var card in player.PlayerHand.getCards())
+                    tempCards.Add(new CardDto(card.Suit, card.Number));
+
+                var tempHandDto = new HandDto(
+                    tempCards,
+                    player.PlayerHand.valueOfHand()
+                );
+
+                // Populate the PlayerDto
+                playersDTOs[i] = new PlayerDto(
+                    player.PlayerId,
+                    tempHandDto,
+                    player.BetValue,
+                    player.HasPlacedBet,
+                    player.HasStood,
+                    player.IsBusted,
+                    player.Outcome
+                );
             }
 
-            _deck = new Deck();
-            _deck.Shuffle();
-            _dealerHand = new Hand();
-            currentTurnIndex = 0;
-            dealerSecondCardFlipped = false;
 
-            return _players;
-        }
 
-        public int GetCurrentTurnIndex()
-        {
-            return currentTurnIndex;
-        }
-
-        public object DealInitialCards()
-        {
-            foreach (var player in _players)
+            //Creates a dealers card list and cardDTO
+            List<CardDto> dealerCards = new List<CardDto>();
+            foreach (var card in dealerHand.getCards())
             {
-                player.SetPlayerHand(new Hand());
+                dealerCards.Add(new CardDto(card.Suit, card.Number));
             }
 
-            _deck = new Deck();
-            _deck.Shuffle();
-            _dealerHand = new Hand();
-            dealerSecondCardFlipped = false;
+            //Creates handDTO
+            HandDto dealerHandDto = new HandDto(
+                dealerCards,
+                dealerHand.valueOfHand()
+            );
 
-            _engine.DealHands(_players, _dealerHand, _deck);
+            //Returns a new mu
+            return new MultiplayerGameState
+                (
+                    playersDTOs,
+                    dealerHandDto,
+                    currentPlayerIndex,
+                    isRoundOver
+                );
 
-            currentTurnIndex = 0;
+        }
 
-            return new
+        //Intializes the game
+        public MultiplayerGameState Intialize(User[] users)
+        {
+
+            players = new Player[users.Length];
+            for (int i = 0; i < users.Length; i++)
             {
-                players = _players.Select(p => new
-                {
-                    userId = p.GetPlayerId(),
-                    username = p.GetPlayerName(),
-                    handValue = p.GetPlayerHand().valueOfHand(),
-                    cards = p.GetPlayerHand().getCards().Select(c => new { number = c.Number, suit = c.Suit })
-                }),
-                dealer = new
-                {
-                    handValue = _dealerHand.getCards().Count > 0 ? CalculateVisibleDealerCard(_dealerHand.getCards()[0]) : 0,
-                    cards = _dealerHand.getCards().Select((c, i) => new
-                    {
-                        number = i == 1 ? 0 : c.Number,
-                        suit = i == 1 ? "face-down" : c.Suit
-                    }).ToList()
-                }
-            };
+                User user = users[i];
+                players[i] = new Player(user.UserId, user.Username, user.Balance);
+            }
+
+            deck = new Deck();
+            isRoundOver = false;
+        
+            BlackJackEngine.DealHands(players, dealerHand, deck);
+
+            currentPlayerIndex = 0;
+            isRoundOver = false;
+
+            return MapToGameState();
+
         }
 
-        private int CalculateVisibleDealerCard(Card card)
+        public ActionResultDto PlaceBet(BetCommandDto command)
         {
-            if (card.Number == 1) return 11;
-            if (card.Number >= 11 && card.Number <= 13) return 10;
-            return card.Number;
+            //finds the player in the list that matches the players command ID
+            Player player = players.FirstOrDefault(p => p.PlayerId == command.PlayerId);
+
+            if (player == null) 
+            {
+                return new ActionResultDto(false, $"Player {command.PlayerId} not found");
+            }
+
+            try
+            {
+                player.PlaceBet(command.Amount);
+                return new ActionResultDto(true, "Bet placed");
+            }
+            catch (Exception ex)
+            {
+                return new ActionResultDto(false, ex.Message);
+            }
+
         }
 
-        public object RegisterBet(string username, float amount)
+        public ActionResultDto Hit(HitCommandDto cmd)
         {
-            var player = _players.FirstOrDefault(p => p.GetPlayerName() == username);
+            Player player = players.FirstOrDefault(p => p.PlayerId == cmd.PlayerId);
+
             if (player == null)
-                return new { success = false, message = "Player not found" };
-
-            player.SetBetValue(amount);
-            Console.WriteLine($"{player.GetPlayerName()} bets {amount}");
-
-            if (currentTurnIndex < _players.Count - 1)
-                currentTurnIndex++;
-
-            return new { success = true, currentTurnIndex };
-        }
-
-        public object Stand(int userId)
-        {
-            var player = _players.FirstOrDefault(p => p.GetPlayerId() == userId);
-            if (player == null) return new { success = false };
-
-            Console.WriteLine($"{player.GetPlayerName()} stands.");
-
-            if (currentTurnIndex < _players.Count - 1)
-                currentTurnIndex++;
-
-            return new { success = true, currentTurnIndex };
-        }
-
-        public object Double(int userId)
-        {
-            var player = _players.FirstOrDefault(p => p.GetPlayerId() == userId);
-            if (player == null) return new { success = false };
-
-            float currentBet = player.GetBetValue();
-            player.SetBetValue(currentBet * 2);
-
-            Console.WriteLine($"{player.GetPlayerName()} doubles to {player.GetBetValue()}");
-
-            return new { success = true, bet = player.GetBetValue() };
-        }
-
-        public object Hit(int userId)
-        {
-            var player = _players.FirstOrDefault(p => p.GetPlayerId() == userId);
-            if (player == null) return new { success = false };
-
-            var hand = player.GetPlayerHand();
-            var card = _deck.Draw();
-            hand.AddCard(card);
-            int handValue = hand.valueOfHand();
-
-            Console.WriteLine($"{player.GetPlayerName()} hits and draws {card.Number} of {card.Suit} (Total: {handValue})");
-
-            bool isBusted = handValue > 21;
-            bool isPerfect21 = handValue == 21;
-
-            if (isBusted)
             {
-                Console.WriteLine($"{player.GetPlayerName()} busted. Moving to next player.");
+                return new ActionResultDto(false, "Player not found");
             }
-            else if (isPerfect21)
+            if (player.PlayerId != players[currentPlayerIndex].PlayerId)
             {
-                Console.WriteLine($"{player.GetPlayerName()} hit exactly 21. Moving to next player.");
+                return new ActionResultDto(false, "Not your turn");
             }
 
-            if ((isBusted || isPerfect21) && currentTurnIndex < _players.Count - 1)
-            {
-                currentTurnIndex++;
+            int total = BlackJackEngine.Hit(player.PlayerHand, deck);
+
+            if (total > 21) {
+                player.Outcome = WinnerType.Dealer;
             }
 
-            return new
-            {
-                success = true,
-                newCard = new { number = card.Number, suit = card.Suit },
-                handValue,
-                isBusted,
-                isPerfect21,
-                currentTurnIndex
-            };
+            if (player.IsBusted)
+                AdvanceTurn();
+
+            return new ActionResultDto(true, $"Drew Card, new total = {total}");
         }
 
-        public object DealerStep()
+        public ActionResultDto Stand(StandCommandDto command)
         {
-            if (!dealerSecondCardFlipped)
+            Player player = players.FirstOrDefault(p => p.PlayerId == command.PlayerId);
+
+            if (player == null)
             {
-                dealerSecondCardFlipped = true;
-                return new
+                return new ActionResultDto(false, "Player not found");
+            }
+
+            if (player.PlayerId != players[currentPlayerIndex].PlayerId)
+            {
+                return new ActionResultDto(false, "Not your turn");
+            }
+            
+            player.HasStood = true;
+            AdvanceTurn();
+            return new ActionResultDto(true, "Player stood");
+        }
+
+        private void AdvanceTurn() 
+        {
+            bool someoneStillToAct = players.Any(p => !p.HasStood && !p.IsBusted);
+
+            //Updates player loop, uses remainder to keep looping continously
+            int next = (currentPlayerIndex + 1) % players.Length;
+
+            if (someoneStillToAct)
+            {
+                 
+                int nextIndex = (currentPlayerIndex + 1) % players.Length;
+
+                //Searches for player who hasn't busted or stood
+                while (players[nextIndex].HasStood || players[nextIndex].IsBusted)
                 {
-                    flippedSecondCard = true,
-                    drawnCard = (object?)null,
-                    handValue = _dealerHand.valueOfHand(),
-                    cards = _dealerHand.getCards().Select(c => new { number = c.Number, suit = c.Suit }),
-                    shouldContinue = true
-                };
+                    nextIndex = (nextIndex + 1) % players.Length;
+                }
+                currentPlayerIndex = nextIndex;
+            }
+            else
+            {
+                //Gets dealers total
+                int dealerTotal = BlackJackEngine.PlayDealer(dealerHand, deck);   
+
+                //Goes through each player and calculates if they won or not
+                foreach (Player player in players)
+                {
+                    int playerTotal = player.PlayerHand.valueOfHand();
+                    float payout = BlackJackEngine.ComputePayout(playerTotal, dealerTotal, player.BetValue);  
+
+                    // Update balance and set Outcome
+                    player.UpdateBalance(payout);
+                    player.BetValue = 0;
+
+                    if (payout > 0) 
+                    {
+                        player.Outcome = WinnerType.Player;
+                    }
+                    else if(payout < 0)
+                    {
+                        player.Outcome = WinnerType.Dealer;
+                    }
+                    else
+                    {
+                        player.Outcome = WinnerType.Push;
+                    }
+
+                    
+
+                }
+
+                //end round
+                isRoundOver = true;
             }
 
-            var (drawnCard, handValue, shouldContinue) = _engine.DealerStepDraw(_dealerHand, _deck, _players);
-
-            return new
-            {
-                flippedSecondCard = false,
-                drawnCard = drawnCard == null ? null : new { number = drawnCard.Number, suit = drawnCard.Suit },
-                handValue,
-                cards = _dealerHand.getCards().Select(c => new { number = c.Number, suit = c.Suit }),
-                shouldContinue
-            };
         }
+
     }
 }

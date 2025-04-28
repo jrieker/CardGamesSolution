@@ -1,4 +1,4 @@
-﻿namespace CardGamesSolution.Server.Shared
+namespace CardGamesSolution.Server.Shared
 {
 
     /// <summary>
@@ -24,6 +24,14 @@
                 }
             }
         }
+
+        /// <summary>
+        /// Returns all cards in the deck.
+        /// </summary>
+        public List<Card> GetCards() {
+            return cards;
+        }
+
 
         /// <summary>
         /// Shuffles the deck.

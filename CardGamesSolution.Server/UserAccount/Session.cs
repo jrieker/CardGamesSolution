@@ -8,11 +8,12 @@ namespace CardGamesSolution.Server.UserAccount
     public class Session : ISessionEngine
     {
         // List to store active users in the session
-        private List<User> users = new List<User>();
+        public List<User> users { get; set; }
         private IUserDataAccessor userDataAccessor;
 
         public Session(IUserDataAccessor userDataAccessor)
         {
+            this.users = new List<User>();
             this.userDataAccessor = userDataAccessor;
         }
 
@@ -23,7 +24,10 @@ namespace CardGamesSolution.Server.UserAccount
 
         public void RemoveUser(User user)
         {
-            users.Remove(user);
+            if (users.Contains(user)) {
+                userDataAccessor.SaveUserData(user);
+                users.Remove(user);
+            }
         }
 
         public void StartGame()

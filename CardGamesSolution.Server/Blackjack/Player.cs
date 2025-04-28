@@ -1,15 +1,19 @@
 ﻿namespace CardGamesSolution.Server.Blackjack
 {
     public class Player : IPlayer
-    {
-        private int PlayerId;
-        private string PlayerName;
+    {   
+        //Values for player
+        public int PlayerId { get; set; }
+        public string PlayerName { get; set; }
+        public float Balance { get; set; }
 
-        private float Balance;
-
-        private Hand PlayerHand;
-
-        private float BetValue = 0;
+        //State variables
+        public Hand PlayerHand { get;  set; } = new Hand();
+        public float BetValue { get;  set; }
+        public bool HasPlacedBet { get;  set; }
+        public bool HasStood { get;  set; }
+        public bool IsBusted => PlayerHand.valueOfHand() > 21;
+        public WinnerType? Outcome { get; set; }
 
         public Player(int id, string name, float balance)
         {
@@ -18,61 +22,28 @@
             this.Balance = balance;
         }
 
-        //Getters
-        public int GetPlayerId()
-        {
-            return this.PlayerId;
-        }
-
-        public string GetPlayerName()
-        {
-            return this.PlayerName;
-        }
-        public float GetBalance()
-        {
-            return this.Balance;
-        }
-
-        public Hand GetPlayerHand()
-        {
-            return this.PlayerHand;
-        }
-
-        public float GetBetValue()
-        {
-            return this.BetValue;
-        }
-
-        //Setters
-        public void SetPlayerId(int id)
-        {
-            this.PlayerId = id;
-        }
-        public void SetPlayerName(string name)
-        {
-            this.PlayerName = name;
-        }
-        public void SetBalance(float balance)
-        {
-            this.SetBalance(balance);
-        }
-
-        public void SetPlayerHand(Hand hand)
-        {
-            this.PlayerHand = hand;
-        }
-
-        public void SetBetValue(float betValue)
-        {
-            this.BetValue = betValue;
-        }
-
         //Methods
 
         //Upate Balance
         public void UpdateBalance(float amountToBeAdded)
         {
             this.Balance += amountToBeAdded;
+        }
+
+        public void PlaceBet(float amount)
+        {
+            if (amount <= 0)
+            {
+                throw new ArgumentException("Bet must be positive.", nameof(amount));
+            }
+            if (amount > Balance)
+            {
+                throw new InvalidOperationException("Cannot bet more than current balance.");
+            }
+
+            BetValue = amount;
+            Balance -= amount;
+            HasPlacedBet = true;
         }
     }
 }

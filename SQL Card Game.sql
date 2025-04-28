@@ -1,18 +1,23 @@
 
 
+drop table Poker;
+drop table Solitaire;
+drop table LeaderBoard;
 drop table Game;
 drop table Users;
+
 
 create table Users(
     UserID int not null,
     userName varchar(255),
     passWord varchar(255),
-    balance int,
-	wins int,
-	losses int,
+    Balance int,
+	Wins int,
+	Losses int,
 	gamesPlayed int,
 	Primary key (UserID),
 );
+
 
 create table Game(
 	GameID int not null,
@@ -21,6 +26,41 @@ create table Game(
 	Primary key (GameID),
 	UserId int FOREIGN KEY REFERENCES Users(UserID)
 );
+
+create table LeaderBoard(
+	LeaderboardID int not null,
+	Wins int,
+	Losses int,
+	winStreak int,
+	Balance int,
+	gamesPlayed int,
+	Primary key (LeaderboardID),
+	UserId int FOREIGN KEY REFERENCES Users(UserID)
+);
+
+create table Poker(
+	PokerID int not null,
+	Wins int,
+	Losses int,
+	winStreak int,
+	Balance int,
+	gamesPlayed int,
+	Primary key (PokerID),
+	GameID int FOREIGN KEY REFERENCES Game(GameID),
+	LeaderboardID int FOREIGN KEY REFERENCES LeaderBoard(LeaderboardID)
+);
+
+create table Solitaire(
+	SolitaireID int not null,
+	Wins int,
+	Losses int,
+	winStreak int,
+	gamesPlayed int,
+	Primary key (SolitaireID),
+	GameID int FOREIGN KEY REFERENCES Game(GameID),
+	LeaderboardID int FOREIGN KEY REFERENCES LeaderBoard(LeaderboardID)
+);
+
 
 insert into Users (UserID, userName, passWord, balance, wins, losses, gamesPlayed) values (001, 'Elliott', '12345', 100, 0, 0, 0);
 insert into Users (UserID, userName, passWord, balance, wins, losses, gamesPlayed) values (002, 'Nick', 'Hello World', 135, 35, 0, 35);

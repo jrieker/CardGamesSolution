@@ -10,7 +10,7 @@ namespace CardGamesSolution.Server.Blackjack
             foreach (var player in players)
             {
                 var card = deck.Draw();
-                player.GetPlayerHand().AddCard(card);
+                player.PlayerHand.AddCard(card);
             }
 
             var dealerCardOne = deck.Draw();
@@ -19,7 +19,7 @@ namespace CardGamesSolution.Server.Blackjack
             foreach (var player in players)
             {
                 var card = deck.Draw();
-                player.GetPlayerHand().AddCard(card);
+                player.PlayerHand.AddCard(card);
             }
 
             var dealerCardTwo = deck.Draw();
@@ -28,8 +28,8 @@ namespace CardGamesSolution.Server.Blackjack
             Console.WriteLine("\n--- Hands Dealt ---");
             foreach (var player in players)
             {
-                Console.Write($"{player.GetPlayerName()}: ");
-                foreach (var card in player.GetPlayerHand().getCards())
+                Console.Write($"{player.PlayerName}: ");
+                foreach (var card in player.PlayerHand.getCards())
                 {
                     Console.Write($"{card.Number} of {card.Suit}, ");
                 }
@@ -73,7 +73,7 @@ namespace CardGamesSolution.Server.Blackjack
 
             foreach (var player in players)
             {
-                int playerValue = player.GetPlayerHand().valueOfHand();
+                int playerValue = player.PlayerHand.valueOfHand();
                 if (playerValue <= 21 && playerValue >= dealerValue)
                 {
                     return (card, dealerValue, true); 

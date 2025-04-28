@@ -8,5 +8,6 @@ namespace CardGamesSolution.Server.Database
         bool UserExists(string username);
         void SaveUserData(User user);
         int GetNextUserId();
+        void DeleteUserByUsername(string username);
     }
 }
