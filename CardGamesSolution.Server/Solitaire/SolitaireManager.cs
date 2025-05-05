@@ -7,16 +7,15 @@ namespace CardGamesSolution.Server.Solitaire
     public class SolitaireManager : ISolitaireManager
     {
         private ISolitaireEngine engine;
-        private Deck deck;
 
         public SolitaireManager(ISolitaireEngine solitaireEngine)
         {
             engine = solitaireEngine;
-            deck = new Deck();
         }
 
         public void StartNewGame()
         {
+            var deck = new Deck();
             deck.Shuffle();
             engine.InitializeGame(deck.GetCards());
         }
@@ -46,6 +45,5 @@ namespace CardGamesSolution.Server.Solitaire
         {
             return engine.GetGameState();
         }
-
     }
 }
