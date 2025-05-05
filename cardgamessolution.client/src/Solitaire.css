@@ -24,13 +24,13 @@
     font-size: 24px;
 }
 
-    .card-content.red {
-        color: red;
-    }
+.card-content.red {
+    color: red;
+}
 
-    .card-content.black {
-        color: black;
-    }
+.card-content.black {
+    color: black;
+}
 
 .card-corner {
     position: absolute;
@@ -41,17 +41,17 @@
     z-index: 2;
 }
 
-    .card-corner.top {
-        top: 4px;
-        left: 4px;
-        align-items: flex-start;
-    }
+.card-corner.top {
+    top: 4px;
+    left: 4px;
+    align-items: flex-start;
+}
 
-    .card-corner.bottom {
-        bottom: 4px;
-        right: 4px;
-        align-items: flex-end;
-    }
+.card-corner.bottom {
+    bottom: 4px;
+    right: 4px;
+    align-items: flex-end;
+}
 
 .corner-icon {
     width: 9px;
@@ -59,8 +59,13 @@
     margin-top: 2px;
 }
 
+.small-card {
+    width: 50px;
+    height: 70px;
+}
+
 .card-back {
-    background-color: #550000; 
+    background-color: #550000;
     border-radius: 8px;
     width: 50px;
     height: 70px;
