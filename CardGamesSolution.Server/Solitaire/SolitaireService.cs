@@ -4,15 +4,11 @@ namespace CardGamesSolution.Server.Solitaire
 {
     public class SolitaireService
     {
-        private readonly ISolitaireManager manager;
-
-        public SolitaireService()
-        {
-            this.manager = new SolitaireManager(new SolitaireEngine());
-        }
+        private ISolitaireManager manager = new SolitaireManager(new SolitaireEngine());
 
         public void StartGame()
         {
+            manager = new SolitaireManager(new SolitaireEngine());
             manager.StartNewGame();
         }
 
