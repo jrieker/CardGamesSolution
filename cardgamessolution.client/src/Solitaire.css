@@ -1,75 +1,70 @@
 .table-screen {
-    width: 100vw;
-    height: 100vh;
-    background-color: rgb(60, 100, 60);
-    position: relative;
-    overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgb(60, 100, 60);
+  position: relative;
+  overflow: hidden;
 }
 
 .card {
-    position: absolute;
-    background-color: white;
-    border-radius: 8px;
-    border: 1px solid black;
-    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    overflow: hidden;
-    z-index: 1;
+  position: absolute;
+  background-color: white;
+  border-radius: 8px;
+  border: 1px solid black;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  z-index: 1;
 }
 
 .card-content {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    font-weight: bold;
-    font-size: 24px;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  font-weight: bold;
+  font-size: 24px;
 }
 
 .card-content.red {
-    color: red;
+  color: red;
 }
 
 .card-content.black {
-    color: black;
+  color: black;
 }
 
 .card-corner {
-    position: absolute;
-    font-size: 14px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    z-index: 2;
+  position: absolute;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
 }
 
 .card-corner.top {
-    top: 4px;
-    left: 4px;
-    align-items: flex-start;
+  top: 4px;
+  left: 4px;
+  align-items: flex-start;
 }
 
 .card-corner.bottom {
-    bottom: 4px;
-    right: 4px;
-    align-items: flex-end;
+  bottom: 4px;
+  right: 4px;
+  align-items: flex-end;
 }
 
 .corner-icon {
-    width: 9px;
-    height: 9px;
-    margin-top: 2px;
-}
-
-.small-card {
-    width: 50px;
-    height: 70px;
+  width: 9px;
+  height: 9px;
+  margin-top: 2px;
 }
 
 .card-back {
-    background-color: #550000;
-    border-radius: 8px;
-    width: 50px;
-    height: 70px;
-    border: 1px solid black;
-    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    position: absolute;
+  background-color: #550000; 
+  border-radius: 8px;
+  width: 50px;
+  height: 70px;
+  border: 1px solid black;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  position: absolute;
 }
