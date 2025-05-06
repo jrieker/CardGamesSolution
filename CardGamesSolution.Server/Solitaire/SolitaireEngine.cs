@@ -7,6 +7,18 @@ namespace CardGamesSolution.Server.Solitaire {
     public class SolitaireEngine : ISolitaireEngine {
         private GameState gameState = new GameState();
 
+         public SolitaireEngine() {
+            gameState = new GameState();
+        }
+
+        public SolitaireEngine(GameState initialState) {
+            gameState = initialState;
+        }
+
+        public void SetGameState(GameState newState) {
+            gameState = newState;
+        }
+
         // This is all Solitaire LOGIC
         // Gamestate holds all logic about current game
         // Gamestate updates as a player makes moves
