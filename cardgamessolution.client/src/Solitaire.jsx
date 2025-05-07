@@ -18,51 +18,77 @@ const getCardLabel = (number) => {
 
 function Solitaire({ username }) {
   const [gameState, setGameState] = useState(null);
+  const [selectedCard, setSelectedCard] = useState(null);
 
   useEffect(() => {
     const startGame = async () => {
-      try {
-        const startRes = await fetch('/api/solitaire/start', { method: 'POST' });
-        if (!startRes.ok) {
-          console.error('Failed to start game');
-          return;
-        }
-
-        const stateRes = await fetch('/api/solitaire/state');
-        const stateJson = await stateRes.json();
-
-        setGameState(stateJson.state);
-      } catch (err) {
-        console.error('Error initializing game:', err);
-      }
+      await fetch('/api/solitaire/start', { method: 'POST' });
+      const res = await fetch('/api/solitaire/state');
+      const data = await res.json();
+      setGameState(data.state);
     };
-
     startGame();
   }, []);
 
-  const renderCard = (card, faceUp, index) => {
-    if (!faceUp) {
-      return (
-        <div
-          key={index}
-          className="card-back"
-          style={{ top: `${index * 15}px`, position: 'absolute' }}
-        ></div>
-      );
+  const handleMove = async (toPile) => {
+    if (!selectedCard) return;
+
+    const response = await fetch('/api/solitaire/move', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        card: selectedCard.card,
+        fromPile: selectedCard.fromPile,
+        toPile: toPile
+      })
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      setGameState(data.state);
+      setSelectedCard(null);
+    } else {
+      alert(data.message);
+      setSelectedCard(null);
     }
+  };
 
+  const renderCard = (card, faceUp, index, fromPile) => {
     const color = card.suit === 'Hearts' || card.suit === 'Diamonds' ? 'red' : 'black';
+    const isSelected =
+      selectedCard &&
+      selectedCard.card.suit === card.suit &&
+      selectedCard.card.number === card.number &&
+      selectedCard.fromPile === fromPile;
 
-    return (
+    const handleClick = () => {
+      if (!faceUp) return;
+
+      if (!selectedCard) {
+        setSelectedCard({ card, fromPile });
+      } else if (
+        selectedCard.card.suit === card.suit &&
+        selectedCard.card.number === card.number &&
+        selectedCard.fromPile === fromPile
+      ) {
+        setSelectedCard(null);
+      } else {
+        handleMove(fromPile);
+      }
+    };
+
+    return faceUp ? (
       <div
         key={index}
-        className="card"
+        className={`card ${isSelected ? 'selected' : ''}`}
         style={{
           top: `${index * 15}px`,
           width: '50px',
           height: '70px',
-          position: 'absolute'
+          position: 'absolute',
+          cursor: 'pointer'
         }}
+        onClick={handleClick}
       >
         <div className={`card-content ${color}`}>
           <div className="card-corner top">
@@ -73,59 +99,52 @@ function Solitaire({ username }) {
           </div>
         </div>
       </div>
+    ) : (
+      <div
+        key={index}
+        className="card-back"
+        style={{ top: `${index * 15}px`, position: 'absolute' }}
+      ></div>
     );
   };
 
   const renderTableau = () => {
-    if (!gameState || !gameState.tableau) return null;
+    if (!gameState?.tableau) return null;
 
     return (
-      <div
-        style={{
-          display: 'flex',
-          gap: '15px',
-          padding: '20px 40px',
-          alignItems: 'flex-start'
-        }}
-      >
-        {gameState.tableau.map((pile, i) => (
-          <div
-            key={i}
-            style={{
-              position: 'relative',
-              width: '50px',
-              height: '400px'
-            }}
-          >
-            {pile.faceDown.map((card, idx) => renderCard(card, false, idx))}
-            {pile.faceUp.map((card, idx) => renderCard(card, true, pile.faceDown.length + idx))}
-          </div>
-        ))}
+      <div style={{ display: 'flex', gap: '15px', padding: '20px 40px' }}>
+        {gameState.tableau.map((pile, i) => {
+          const pileName = `Pile${i + 1}`;
+          return (
+            <div
+              key={i}
+              style={{ position: 'relative', width: '50px', height: '400px' }}
+              onClick={() => handleMove(pileName)}
+            >
+              {pile.faceDown.map((card, idx) =>
+                renderCard(card, false, idx, pileName)
+              )}
+              {pile.faceUp.map((card, idx) =>
+                renderCard(card, true, pile.faceDown.length + idx, pileName)
+              )}
+            </div>
+          );
+        })}
       </div>
     );
   };
 
+  const handleFoundationClick = (suit) => {
+    handleMove(suit);
+  };
+
   return (
     <div className="table-screen">
-      <div
-        style={{
-          position: 'absolute',
-          top: '10px',
-          left: '10px',
-          color: 'white',
-          fontSize: '18px'
-        }}
-      >
+      <div style={{ position: 'absolute', top: '10px', left: '10px', color: 'white' }}>
         {username}
       </div>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          padding: '20px 40px'
-        }}
-      >
+      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '20px 40px' }}>
         <div style={{ display: 'flex', gap: '20px' }}>
           <div
             onClick={async () => {
@@ -133,45 +152,43 @@ function Solitaire({ username }) {
               const res = await fetch('/api/solitaire/state');
               const data = await res.json();
               setGameState(data.state);
+              setSelectedCard(null);
             }}
             style={{ cursor: 'pointer' }}
           >
             {gameState?.stock?.length ? (
-              <div className="card-back"></div>
+              <div className="card-back" />
             ) : (
-              <div
-                style={{
-                  width: '50px',
-                  height: '70px',
-                  border: '1px solid gray'
-                }}
-              />
+              <div style={{ width: '50px', height: '70px', border: '1px solid gray' }} />
             )}
           </div>
           <div>
             {gameState?.waste?.length ? (
-              renderCard(gameState.waste.at(-1), true, 0)
+              renderCard(
+                gameState.waste.at(-1),
+                true,
+                0,
+                'Waste'
+              )
             ) : (
-              <div
-                style={{
-                  width: '50px',
-                  height: '70px',
-                  border: '1px solid white'
-                }}
-              />
+              <div style={{ width: '50px', height: '70px', border: '1px solid white' }} />
             )}
           </div>
         </div>
+
         <div style={{ display: 'flex', gap: '20px' }}>
           {['Hearts', 'Diamonds', 'Clubs', 'Spades'].map((suit) => {
             const pile = gameState?.foundations?.[suit] || [];
             const topCard = pile.at(-1);
 
             return topCard ? (
-              renderCard(topCard, true, 0)
+              <div key={suit} onClick={() => handleFoundationClick(suit)}>
+                {renderCard(topCard, true, 0, suit)}
+              </div>
             ) : (
               <div
                 key={suit}
+                onClick={() => handleFoundationClick(suit)}
                 style={{
                   width: '50px',
                   height: '70px',
@@ -180,7 +197,8 @@ function Solitaire({ username }) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: 'white',
-                  fontSize: '20px'
+                  fontSize: '20px',
+                  cursor: 'pointer'
                 }}
               >
                 {suit[0]}
@@ -189,6 +207,7 @@ function Solitaire({ username }) {
           })}
         </div>
       </div>
+
       {renderTableau()}
     </div>
   );
