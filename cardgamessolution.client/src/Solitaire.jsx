@@ -22,10 +22,14 @@ function Solitaire({ username }) {
 
   useEffect(() => {
     const startGame = async () => {
-      await fetch('/api/solitaire/start', { method: 'POST' });
-      const res = await fetch('/api/solitaire/state');
-      const data = await res.json();
-      setGameState(data.state);
+      try {
+        await fetch('/api/solitaire/start', { method: 'POST' });
+        const res = await fetch('/api/solitaire/state');
+        const data = await res.json();
+        setGameState(data.state);
+      } catch (e) {
+        console.error('Failed to initialize game:', e);
+      }
     };
     startGame();
   }, []);
@@ -33,25 +37,33 @@ function Solitaire({ username }) {
   const handleMove = async (toPile) => {
     if (!selectedCard) return;
 
-    const response = await fetch('/api/solitaire/move', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        card: selectedCard.card,
-        fromPile: selectedCard.fromPile,
-        toPile: toPile
-      })
-    });
+    try {
+      const response = await fetch('/api/solitaire/move', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          card: selectedCard.card,
+          fromPile: selectedCard.fromPile,
+          toPile
+        })
+      });
 
-    const data = await response.json();
-    if (data.success) {
-      setGameState(data.state);
-    } 
-    setSelectedCard(null);
-    
+      const data = await response.json();
+      if (data.success) {
+        setGameState(data.gameState);
+        setSelectedCard(null);
+      } else {
+        console.warn('Invalid move:', data.message);
+        setSelectedCard(null);
+      }
+    } catch (e) {
+      console.error('Move failed:', e);
+      setSelectedCard(null);
+    }
   };
 
   const renderCard = (card, faceUp, index, fromPile) => {
+    if (!card) return null;
     const color = card.suit === 'Hearts' || card.suit === 'Diamonds' ? 'red' : 'black';
     const isSelected =
       selectedCard &&
@@ -102,7 +114,7 @@ function Solitaire({ username }) {
         key={index}
         className="card-back"
         style={{ top: `${index * 15}px`, position: 'absolute' }}
-      ></div>
+      />
     );
   };
 
@@ -119,11 +131,11 @@ function Solitaire({ username }) {
               style={{ position: 'relative', width: '50px', height: '400px' }}
               onClick={() => handleMove(pileName)}
             >
-              {pile.faceDown.map((card, idx) =>
+              {(pile.faceDown ?? []).map((card, idx) =>
                 renderCard(card, false, idx, pileName)
               )}
-              {pile.faceUp.map((card, idx) =>
-                renderCard(card, true, pile.faceDown.length + idx, pileName)
+              {(pile.faceUp ?? []).map((card, idx) =>
+                renderCard(card, true, (pile.faceDown?.length ?? 0) + idx, pileName)
               )}
             </div>
           );
@@ -135,6 +147,8 @@ function Solitaire({ username }) {
   const handleFoundationClick = (suit) => {
     handleMove(suit);
   };
+
+  if (!gameState) return <div>Loading game...</div>;
 
   return (
     <div className="table-screen">
@@ -154,20 +168,15 @@ function Solitaire({ username }) {
             }}
             style={{ cursor: 'pointer' }}
           >
-            {gameState?.stock?.length ? (
+            {gameState.stock?.length ? (
               <div className="card-back" />
             ) : (
               <div style={{ width: '50px', height: '70px', border: '1px solid gray' }} />
             )}
           </div>
           <div>
-            {gameState?.waste?.length ? (
-              renderCard(
-                gameState.waste.at(-1),
-                true,
-                0,
-                'Waste'
-              )
+            {gameState.waste?.length ? (
+              renderCard(gameState.waste.at(-1), true, 0, 'Waste')
             ) : (
               <div style={{ width: '50px', height: '70px', border: '1px solid white' }} />
             )}
@@ -176,21 +185,17 @@ function Solitaire({ username }) {
 
         <div style={{ display: 'flex', gap: '20px' }}>
           {['Hearts', 'Diamonds', 'Clubs', 'Spades'].map((suit) => {
-            const pile = gameState?.foundations?.[suit] || [];
-            const topCard = pile.at(-1);
+            const pile = gameState.foundations?.[suit] ?? [];
+            const topCard = pile.at?.(-1);
 
-            return topCard ? (
-              <div key={suit} onClick={() => handleFoundationClick(suit)}>
-                {renderCard(topCard, true, 0, suit)}
-              </div>
-            ) : (
+            return (
               <div
                 key={suit}
                 onClick={() => handleFoundationClick(suit)}
                 style={{
                   width: '50px',
                   height: '70px',
-                  border: '2px dashed white',
+                  border: topCard ? 'none' : '2px dashed white',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -199,7 +204,9 @@ function Solitaire({ username }) {
                   cursor: 'pointer'
                 }}
               >
-                {suit[0]}
+                {topCard
+                  ? renderCard(topCard, true, 0, suit)
+                  : suit[0]}
               </div>
             );
           })}
