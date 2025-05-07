@@ -46,11 +46,9 @@ function Solitaire({ username }) {
     const data = await response.json();
     if (data.success) {
       setGameState(data.state);
-      setSelectedCard(null);
-    } else {
-      alert(data.message);
-      setSelectedCard(null);
-    }
+    } 
+    setSelectedCard(null);
+    
   };
 
   const renderCard = (card, faceUp, index, fromPile) => {
