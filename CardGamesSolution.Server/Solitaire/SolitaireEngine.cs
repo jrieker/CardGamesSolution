@@ -18,15 +18,10 @@ namespace CardGamesSolution.Server.Solitaire {
             gameState = newState;
         }
 
-        // This is all Solitaire LOGIC
-        // Gamestate holds all logic about current game
-        // Gamestate updates as a player makes moves
-
         public void InitializeGame(List<Card> cards) {
             gameState = new GameState();
-
-            // Starts a new game with shuffled cards
             int index = 0;
+
             for (int i = 0; i < 7; i++) {
                 var pile = gameState.Tableau[i];
                 for (int j = 0; j < i; j++) {
@@ -35,11 +30,8 @@ namespace CardGamesSolution.Server.Solitaire {
                 pile.FaceUp.Add(cards[index++]);
             }
 
-            // deals cards to 7 tableau piles
-            // for each pile i, put all cards faced down and 1 card faced up
             for (; index < cards.Count; index++) {
                 gameState.Stock.Add(cards[index]);
-                // throw all remaining cards in stock pile once tableau finished
             }
         }
 
@@ -69,11 +61,9 @@ namespace CardGamesSolution.Server.Solitaire {
                 } else if (fromPile.StartsWith("Pile")) {
                     int fromIndex = int.Parse(fromPile.Replace("Pile", "")) - 1;
                     fromPileObj = gameState.Tableau[fromIndex];
-
                     if (fromPileObj.FaceUp.Count == 0 || !CardsEqual(fromPileObj.FaceUp[^1], card)) {
                         return new MoveResult(false, "You can only move the top face up card.", gameState);
                     }
-
                     fromPileObj.FaceUp.RemoveAt(fromPileObj.FaceUp.Count - 1);
                     if (fromPileObj.FaceUp.Count == 0 && fromPileObj.FaceDown.Count > 0) {
                         var flipped = fromPileObj.FaceDown[^1];
@@ -90,11 +80,9 @@ namespace CardGamesSolution.Server.Solitaire {
 
             if (fromPile.StartsWith("Pile")) {
                 int fromIndex = int.Parse(fromPile.Replace("Pile", "")) - 1;
+                if (fromIndex < 0 || fromIndex >= gameState.Tableau.Count)
+                    return new MoveResult(false, "Invalid fromPile index.", gameState);
                 fromPileObj = gameState.Tableau[fromIndex];
-
-                if (fromPileObj.FaceUp.Count == 0 || !CardsEqual(fromPileObj.FaceUp[^1], card)) {
-                    return new MoveResult(false, "You can only move the top face up card from a tableau pile.", gameState);
-                }
             } else if (fromPile == "Waste") {
                 if (gameState.Waste.Count == 0 || !CardsEqual(gameState.Waste[^1], card)) {
                     return new MoveResult(false, "You can only move the top card from the waste.", gameState);
@@ -104,6 +92,8 @@ namespace CardGamesSolution.Server.Solitaire {
             }
 
             int toIndex = int.Parse(toPile.Replace("Pile", "")) - 1;
+            if (toIndex < 0 || toIndex >= gameState.Tableau.Count)
+                return new MoveResult(false, "Invalid toPile index.", gameState);
             var toPileObj = gameState.Tableau[toIndex];
 
             if (toPileObj.FaceUp.Count == 0 && toPileObj.FaceDown.Count == 0) {
@@ -113,40 +103,53 @@ namespace CardGamesSolution.Server.Solitaire {
 
                 if (fromPile == "Waste") {
                     gameState.Waste.RemoveAt(gameState.Waste.Count - 1);
+                    toPileObj.FaceUp.Add(card);
                 } else {
-                    fromPileObj!.FaceUp.RemoveAt(fromPileObj.FaceUp.Count - 1);
+                    int moveIndex = fromPileObj.FaceUp.FindIndex(c => CardsEqual(c, card));
+                    if (moveIndex == -1)
+                        return new MoveResult(false, "Card not found in source.", gameState);
+                    var stack = fromPileObj.FaceUp.GetRange(moveIndex, fromPileObj.FaceUp.Count - moveIndex);
+                    fromPileObj.FaceUp.RemoveRange(moveIndex, stack.Count);
                     if (fromPileObj.FaceUp.Count == 0 && fromPileObj.FaceDown.Count > 0) {
                         var flipped = fromPileObj.FaceDown[^1];
                         fromPileObj.FaceDown.RemoveAt(fromPileObj.FaceDown.Count - 1);
                         fromPileObj.FaceUp.Add(flipped);
                     }
+                    toPileObj.FaceUp.AddRange(stack);
                 }
 
-                toPileObj.FaceUp.Add(card);
                 return new MoveResult(true, "King moved to empty pile.", gameState);
+            }
+
+            if (toPileObj.FaceUp.Count == 0) {
+                return new MoveResult(false, "No cards to stack onto.", gameState);
             }
 
             Card destCard = toPileObj.FaceUp[^1];
             if (card.Number != destCard.Number - 1) {
                 return new MoveResult(false, "Card must be one rank lower than destination.", gameState);
             }
-
             if (card.IsRed() == destCard.IsRed()) {
                 return new MoveResult(false, "Card must be opposite color of destination.", gameState);
             }
 
             if (fromPile == "Waste") {
                 gameState.Waste.RemoveAt(gameState.Waste.Count - 1);
+                toPileObj.FaceUp.Add(card);
             } else {
-                fromPileObj!.FaceUp.RemoveAt(fromPileObj.FaceUp.Count - 1);
+                int moveIndex = fromPileObj.FaceUp.FindIndex(c => CardsEqual(c, card));
+                if (moveIndex == -1)
+                    return new MoveResult(false, "Card not found in source tableau.", gameState);
+                var movingStack = fromPileObj.FaceUp.GetRange(moveIndex, fromPileObj.FaceUp.Count - moveIndex);
+                fromPileObj.FaceUp.RemoveRange(moveIndex, movingStack.Count);
                 if (fromPileObj.FaceUp.Count == 0 && fromPileObj.FaceDown.Count > 0) {
                     var flipped = fromPileObj.FaceDown[^1];
                     fromPileObj.FaceDown.RemoveAt(fromPileObj.FaceDown.Count - 1);
                     fromPileObj.FaceUp.Add(flipped);
                 }
+                toPileObj.FaceUp.AddRange(movingStack);
             }
 
-            toPileObj.FaceUp.Add(card);
             return new MoveResult(true, "Move successful.", gameState);
         }
 
