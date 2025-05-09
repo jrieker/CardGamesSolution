@@ -1,4 +1,4 @@
-﻿using CardGamesSolution.Server.Shared;
+using CardGamesSolution.Server.Shared;
 using CardGamesSolution.Server.UserAccount;
 
 namespace CardGamesSolution.Server.Blackjack
@@ -24,8 +24,9 @@ namespace CardGamesSolution.Server.Blackjack
             Console.WriteLine("Blackjack game started with players:");
             foreach (var player in _players)
             {
-                Console.WriteLine($"- {player.PlayerName}");
+                Console.WriteLine($"- {player.PlayerName} (${player.Balance})");
             }
+
 
             _deck = new Deck();
             _deck.Shuffle();
@@ -63,6 +64,7 @@ namespace CardGamesSolution.Server.Blackjack
                 {
                     userId = p.PlayerId,
                     username = p.PlayerName,
+                    balance = p.Balance,
                     handValue = p.PlayerHand.valueOfHand(),
                     cards = p.PlayerHand.getCards().Select(c => new { number = c.Number, suit = c.Suit })
                 }),
@@ -91,14 +93,34 @@ namespace CardGamesSolution.Server.Blackjack
             if (player == null)
                 return new { success = false, message = "Player not found" };
 
+            if (amount > player.Balance)
+            {
+                if (player.Balance == 0 && amount == 5)
+                {
+                    player.BetValue = amount;
+                    Console.WriteLine($"{player.PlayerName} has 0 balance but gets a free $5 bet.");
+
+                    if (currentTurnIndex < _players.Count - 1)
+                        currentTurnIndex++;
+
+                    return new { success = true, currentTurnIndex };
+                }
+
+                return new { success = false, message = "Cannot bet more than current balance." };
+            }
+
             player.BetValue = amount;
-            Console.WriteLine($"{player.PlayerName} bets {amount}");
+            player.Balance -= amount;
+
+            Console.WriteLine($"{player.PlayerName} bets {amount}. New balance: {player.Balance}");
 
             if (currentTurnIndex < _players.Count - 1)
                 currentTurnIndex++;
 
             return new { success = true, currentTurnIndex };
         }
+
+
 
         public object Stand(int userId)
         {
@@ -116,15 +138,25 @@ namespace CardGamesSolution.Server.Blackjack
         public object Double(int userId)
         {
             var player = _players.FirstOrDefault(p => p.PlayerId == userId);
-            if (player == null) return new { success = false };
+            if (player == null) return new { success = false, message = "Player not found" };
 
             float currentBet = player.BetValue;
-            player.BetValue = currentBet * 2;
 
-            Console.WriteLine($"{player.PlayerName} doubles to {player.BetValue}");
+            if (player.Balance < currentBet)
+            {
+                Console.WriteLine($"{player.PlayerName} tried to double but only has ${player.Balance} left.");
+                return new { success = false, message = "Insufficient balance to double." };
+            }
+
+            player.BetValue = currentBet * 2;
+            player.Balance -= currentBet;
+
+            Console.WriteLine($"{player.PlayerName} doubles to {player.BetValue}. New balance: {player.Balance}");
 
             return new { success = true, bet = player.BetValue };
         }
+
+
 
         public object Hit(int userId)
         {
@@ -168,29 +200,113 @@ namespace CardGamesSolution.Server.Blackjack
 
         public object DealerStep()
         {
+            bool flippedSecondCard = false;
+            Card? drawnCard = null;
+            int handValue;
+            bool shouldContinue = true;
+            string? winner = null;
+
             if (!dealerSecondCardFlipped)
             {
                 dealerSecondCardFlipped = true;
-                return new
-                {
-                    flippedSecondCard = true,
-                    drawnCard = (object?)null,
-                    handValue = _dealerHand.valueOfHand(),
-                    cards = _dealerHand.getCards().Select(c => new { number = c.Number, suit = c.Suit }),
-                    shouldContinue = true
-                };
-            }
+                flippedSecondCard = true;
 
-            var (drawnCard, handValue, shouldContinue) = _engine.DealerStepDraw(_dealerHand, _deck, _players);
+                handValue = _dealerHand.valueOfHand();
+
+                bool isHigherOrEqualToAll = _players
+                    .Where(p => p.PlayerHand.valueOfHand() <= 21)
+                    .All(p => handValue >= p.PlayerHand.valueOfHand());
+
+                if (handValue <= 21 && isHigherOrEqualToAll)
+                {
+                    winner = "Dealer Wins";
+                    shouldContinue = false;
+                    Console.WriteLine("Dealer wins immediately after revealing second card.");
+                }
+            }
+            else
+            {
+                (drawnCard, handValue, shouldContinue) = _engine.DealerStepDraw(_dealerHand, _deck, _players);
+
+                if (!shouldContinue)
+                {
+                    if (handValue > 21 && drawnCard != null)
+                    {
+                        int drawnCardValue = CalculateVisibleDealerCard(drawnCard);
+                        int preValue = handValue - drawnCardValue;
+
+                        var winningPlayers = _players
+                            .Where(p => p.PlayerHand.valueOfHand() <= 21 &&
+                                        p.PlayerHand.valueOfHand() >= preValue)
+                            .Select(p => p.PlayerName)
+                            .ToList();
+
+                        if (winningPlayers.Any())
+                        {
+                            winner = string.Join(", ", winningPlayers) + " Wins";
+                            Console.WriteLine($"Dealer busts. Winners: {winner}");
+                        }
+                    }
+                    else
+                    {
+                        bool isHigherOrEqualToAll = _players
+                            .Where(p => p.PlayerHand.valueOfHand() <= 21)
+                            .All(p => handValue >= p.PlayerHand.valueOfHand());
+
+                        if (handValue <= 21 && isHigherOrEqualToAll)
+                        {
+                            winner = "Dealer Wins";
+                            Console.WriteLine("Dealer wins after drawing cards.");
+                        }
+                    }
+                }
+            }
 
             return new
             {
-                flippedSecondCard = false,
+                flippedSecondCard,
                 drawnCard = drawnCard == null ? null : new { number = drawnCard.Number, suit = drawnCard.Suit },
                 handValue,
                 cards = _dealerHand.getCards().Select(c => new { number = c.Number, suit = c.Suit }),
-                shouldContinue
+                shouldContinue,
+                winner
             };
         }
+
+
+        public object EndRound()
+        {
+            // Figure out how to save balances to database
+
+            foreach (var player in _players)
+            {
+                player.PlayerHand.clearHand();
+                player.BetValue = 0;
+            }
+
+            _deck = new Deck();
+            _deck.Shuffle();
+            _dealerHand = new Hand();
+            currentTurnIndex = 0;
+            dealerSecondCardFlipped = false;
+
+            Console.WriteLine("New round starting: ");
+            foreach (var player in _players)
+            {
+                Console.WriteLine($"- {player.PlayerName} (${player.Balance})");
+            }
+
+            return new
+            {
+                players = _players.Select(p => new
+                {
+                    userId = p.PlayerId,
+                    username = p.PlayerName,
+                    balance = p.Balance
+                }),
+                currentTurnIndex
+            };
+        }
+
     }
 }
