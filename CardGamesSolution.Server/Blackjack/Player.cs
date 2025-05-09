@@ -1,4 +1,4 @@
-﻿namespace CardGamesSolution.Server.Blackjack
+namespace CardGamesSolution.Server.Blackjack
 {
     public class Player : IPlayer
     {   
@@ -13,7 +13,7 @@
         public bool HasPlacedBet { get;  set; }
         public bool HasStood { get;  set; }
         public bool IsBusted => PlayerHand.valueOfHand() > 21;
-        public WinnerType? Outcome { get; set; }
+        public int Outcome { get; set; } // 0 = loss, 1 = win
 
         public Player(int id, string name, float balance)
         {
