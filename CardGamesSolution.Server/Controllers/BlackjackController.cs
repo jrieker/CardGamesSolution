@@ -1,4 +1,4 @@
-﻿using CardGamesSolution.Server.UserAccount;
+using CardGamesSolution.Server.UserAccount;
 using CardGamesSolution.Server.Blackjack;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
@@ -27,7 +27,8 @@ namespace CardGamesSolution.Server.Controllers
             var result = initializedPlayers.Select(p => new PlayerDto
             {
                 UserId = p.PlayerId,
-                Username = p.PlayerName
+                Username = p.PlayerName,
+                Balance = p.Balance 
             }).ToList();
 
             return Ok(new
@@ -36,6 +37,14 @@ namespace CardGamesSolution.Server.Controllers
                 currentTurnIndex = manager.GetCurrentTurnIndex()
             });
         }
+
+        [HttpPost("end")]
+        public IActionResult EndRound()
+        {
+            var result = manager.EndRound();
+            return Ok(result);
+        }
+
 
         [HttpPost("deal")]
         public IActionResult Deal()
