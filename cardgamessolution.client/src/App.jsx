@@ -10,10 +10,18 @@ function App() {
     const [solitaireUsername, setSolitaireUsername] = useState('');
 
     const handleAddPlayer = (userObj) => {
-        setPlayerList(prev =>
-            prev.some(u => u.userId === userObj.userId) ? prev : [...prev, userObj]
-        );
+        setPlayerList(prev => {
+            if (prev.length >= 6) {
+                alert("Maximum of 6 players allowed.");
+                return prev;
+            }
+
+            return prev.some(u => u.userId === userObj.userId)
+                ? prev
+                : [...prev, userObj];
+        });
     };
+
 
     const handleRemovePlayer = (username) => {
         setPlayerList(prev => prev.filter(player => player.username !== username));
