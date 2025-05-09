@@ -1,25 +1,24 @@
-﻿namespace CardGamesSolution.Server.Leaderboard
+namespace CardGamesSolution.Server.Leaderboard
 {
     namespace CardGamesSolution.Server.Leaderboard
     {
         public interface ILeaderboard
         {
-            /// <summary>Get total wins for each player across all games.</summary>
-            List<LeaderboardEntry> GetAllGameWins();
+            /// Get total wins for each player across all games.
+            Task<List<LeaderboardEntry>> GetAllGameWinsAsync();
 
-            /// <summary>Get wins for each player in a specific game type (e.g. "Poker" or "Solitaire").</summary>
-            List<LeaderboardEntry> GetSpecificGameWins(string gameType);
+            /// Get wins for each player in a specific game type (e.g. "Poker" or "Solitaire")
+            Task<List<LeaderboardEntry>> GetSpecificGameWinsAsync(string gameType);
 
-            /// <summary>Get total earnings (balance) for each player across all games.</summary>
-            List<LeaderboardEntry> GetAllGameEarnings();
+            /// Get total earnings (balance) for each player across all games.
+            Task<List<LeaderboardEntry>> GetAllGameEarningsAsync();
 
-            /// <summary>Get earnings (balance) for each player in a specific game type.</summary>
-            List<LeaderboardEntry> GetSpecificGameEarnings(string gameType);
+            /// Get earnings (balance) for each player in a specific game type.
+            Task<List<LeaderboardEntry>> GetSpecificGameEarningsAsync(string gameType);
 
-            /// <summary>
             /// Get player rankings sorted by a given criterion ("Wins" or "Balance" etc.).
-            /// </summary>
-            List<LeaderboardEntry> GetPlayerRankings(string sortBy);
+
+            Task<List<LeaderboardEntry>> GetPlayerRankingsAsync(string sortBy);
         }
     }
 }
