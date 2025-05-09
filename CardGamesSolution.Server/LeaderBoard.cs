@@ -1,194 +1,110 @@
-﻿namespace CardGamesSolution.Server.Leaderboard
+namespace CardGamesSolution.Server.Leaderboard
 {
     using Microsoft.Data.SqlClient;
-    using CardGamesSolution.Server.Database;
     using System;
     using System.Collections.Generic;
     using global::CardGamesSolution.Server.Database;
+    using System.Data.Common;
 
     namespace CardGamesSolution.Server.Leaderboard
     {
         public class Leaderboard : ILeaderboard
         {
-            private readonly IDatabaseConnection _db;
+            private readonly IDatabaseConnection database;
 
-            // Inject the database connection (existing DatabaseConnection class).
-            public Leaderboard(IDatabaseConnection db)
+            public Leaderboard(IDatabaseConnection dbConnection)
             {
-                _db = db;
+                this.database = dbConnection;
             }
 
             // Get total wins for each player across all games.
-            public List<LeaderboardEntry> GetAllGameWins()
+            public async Task<List<LeaderboardEntry>> GetAllGameWinsAsync()
             {
-                var results = new List<LeaderboardEntry>();
-                using SqlConnection conn = _db.GetConnection();
-                conn.Open();
-                // LeaderBoard table holds each user’s overall wins (Wins column):contentReference[oaicite:14]{index=14}.
-                string query = @"
-                SELECT U.userName AS Username, L.Wins
+                const string sql = @"
+                SELECT U.UserName, L.Wins, L.Losses, L.WinStreak, L.Balance, L.GamesPlayed
                 FROM LeaderBoard L
                 JOIN Users U ON L.UserId = U.UserID";
-                using SqlCommand cmd = new SqlCommand(query, conn);
-                using SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    results.Add(new LeaderboardEntry
-                    {
-                        Username = reader.GetString(0),
-                        Wins = reader.GetInt32(1)
-                    });
-                }
-                return results;
+                return await QueryAsync(sql);
             }
 
             // Get wins per player for a specific game type.
-            public List<LeaderboardEntry> GetSpecificGameWins(string gameType)
+            public async Task<List<LeaderboardEntry>> GetSpecificGameWinsAsync(string gameType)
             {
-                var results = new List<LeaderboardEntry>();
-                using SqlConnection conn = _db.GetConnection();
-                conn.Open();
-
-                // Choose the table based on gameType. For example, "Poker" or "Solitaire".
-                // Each game-specific table has a Wins column and links to Users via LeaderBoardID.
-                string query = "";
-                if (gameType.Equals("Poker", StringComparison.OrdinalIgnoreCase))
-                {
-                    query = @"
-                    SELECT U.userName AS Username, P.Wins
-                    FROM Poker P
-                    JOIN LeaderBoard L ON P.LeaderboardID = L.LeaderBoardID
-                    JOIN Users U ON L.UserId = U.UserID";
-                }
-                else if (gameType.Equals("Solitaire", StringComparison.OrdinalIgnoreCase))
-                {
-                    query = @"
-                    SELECT U.userName AS Username, S.Wins
-                    FROM Solitaire S
-                    JOIN LeaderBoard L ON S.LeaderboardID = L.LeaderBoardID
-                    JOIN Users U ON L.UserId = U.UserID";
-                }
-                else
-                {
-                    throw new ArgumentException($"Unknown game type: {gameType}");
-                }
-
-                using SqlCommand cmd = new SqlCommand(query, conn);
-                using SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    results.Add(new LeaderboardEntry
-                    {
-                        Username = reader.GetString(0),
-                        Wins = reader.GetInt32(1)
-                    });
-                }
-                return results;
+                const string sqlTemplate = @"
+                SELECT U.UserName, L.Wins, L.Losses, L.WinStreak, L.Balance, L.GamesPlayed
+                FROM LeaderBoard L
+                JOIN Users U ON L.UserId = U.UserID
+                WHERE L.GameType = @GameType";
+                return await QueryAsync(sqlTemplate, cmd => cmd.Parameters.AddWithValue("@GameType", gameType));
             }
 
             // Get total earnings (balance) for each player across all games.
-            public List<LeaderboardEntry> GetAllGameEarnings()
+            public async Task<List<LeaderboardEntry>> GetAllGameEarningsAsync()
             {
-                var results = new List<LeaderboardEntry>();
-                using SqlConnection conn = _db.GetConnection();
-                conn.Open();
-                // LeaderBoard table’s Balance holds overall earnings:contentReference[oaicite:15]{index=15}.
-                string query = @"
-                SELECT U.userName AS Username, L.Balance
+                const string sql = @"
+                SELECT U.UserName, L.Wins, L.Losses, L.WinStreak, L.Balance, L.GamesPlayed
                 FROM LeaderBoard L
-                JOIN Users U ON L.UserId = U.UserID";
-                using SqlCommand cmd = new SqlCommand(query, conn);
-                using SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    results.Add(new LeaderboardEntry
-                    {
-                        Username = reader.GetString(0),
-                        Balance = reader.GetInt32(1)
-                    });
-                }
-                return results;
+                JOIN Users U ON L.UserId = U.UserID
+                ORDER BY L.Balance DESC";
+                return await QueryAsync(sql);
             }
 
             // Get earnings per player for a specific game type.
-            public List<LeaderboardEntry> GetSpecificGameEarnings(string gameType)
+            public async Task<List<LeaderboardEntry>> GetSpecificGameEarningsAsync(string gameType)
             {
-                var results = new List<LeaderboardEntry>();
-                using SqlConnection conn = _db.GetConnection();
-                conn.Open();
-
-                string query = "";
-                if (gameType.Equals("Poker", StringComparison.OrdinalIgnoreCase))
-                {
-                    query = @"
-                    SELECT U.userName AS Username, P.Balance
-                    FROM Poker P
-                    JOIN LeaderBoard L ON P.LeaderboardID = L.LeaderBoardID
-                    JOIN Users U ON L.UserId = U.UserID";
-                }
-                else if (gameType.Equals("Solitaire", StringComparison.OrdinalIgnoreCase))
-                {
-                    query = @"
-                    SELECT U.userName AS Username, S.Balance
-                    FROM Solitaire S
-                    JOIN LeaderBoard L ON S.LeaderboardID = L.LeaderBoardID
-                    JOIN Users U ON L.UserId = U.UserID";
-                }
-                else
-                {
-                    throw new ArgumentException($"Unknown game type: {gameType}");
-                }
-
-                using SqlCommand cmd = new SqlCommand(query, conn);
-                using SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    results.Add(new LeaderboardEntry
-                    {
-                        Username = reader.GetString(0),
-                        Balance = reader.GetInt32(1)
-                    });
-                }
-                return results;
+                const string sqlTemplate = @"
+                SELECT U.UserName, L.Wins, L.Losses, L.WinStreak, L.Balance, L.GamesPlayed
+                FROM LeaderBoard L
+                JOIN Users U ON L.UserId = U.UserID
+                WHERE L.GameType = @GameType
+                ORDER BY L.Balance DESC";
+                return await QueryAsync(sqlTemplate, cmd => cmd.Parameters.AddWithValue("@GameType", gameType));
             }
 
             // Get player rankings sorted by a chosen field (e.g. "Wins" or "Balance").
-            public List<LeaderboardEntry> GetPlayerRankings(string sortBy)
+            public async Task<List<LeaderboardEntry>> GetPlayerRankingsAsync(string sortBy)
             {
-                var results = new List<LeaderboardEntry>();
-                using SqlConnection conn = _db.GetConnection();
-                conn.Open();
-
-                // Validate sortBy column to prevent SQL injection.
-                string column = sortBy switch
+                // sortBy: "wins", "losses", "winStreak", "balance", "gamesPlayed"
+                string orderColumn = sortBy switch
                 {
-                    "Wins" => "L.Wins",
-                    "Balance" => "L.Balance",
-                    _ => throw new ArgumentException($"Invalid sort column: {sortBy}")
+                    "wins" => "L.Wins DESC",
+                    "losses" => "L.Losses DESC",
+                    "winStreak" => "L.WinStreak DESC",
+                    "balance" => "L.Balance DESC",
+                    "gamesPlayed" => "L.GamesPlayed DESC",
+                    _ => "L.Wins DESC"
                 };
-
-                string query = $@"
-                SELECT U.userName AS Username, {column} AS Value
+                string sql = $@"
+                SELECT U.UserName, L.Wins, L.Losses, L.WinStreak, L.Balance, L.GamesPlayed
                 FROM LeaderBoard L
                 JOIN Users U ON L.UserId = U.UserID
-                ORDER BY {column} DESC";
+                ORDER BY {orderColumn}";
 
-                using SqlCommand cmd = new SqlCommand(query, conn);
-                using SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
+                return await QueryAsync(sql);
+            }
+            private async Task<List<LeaderboardEntry>> QueryAsync(string sql, Action<SqlCommand> configure = null)
+            {
+                var list = new List<LeaderboardEntry>();
+                using var conn = database.GetConnection();
+                await conn.OpenAsync();
+
+                using var cmd = new SqlCommand(sql, conn);
+                configure?.Invoke(cmd);
+
+                using var reader = await cmd.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
                 {
-                    // Use the 'Value' column for both wins and balance, depending on sortBy.
-                    var entry = new LeaderboardEntry
+                    list.Add(new LeaderboardEntry
                     {
-                        Username = reader.GetString(0)
-                    };
-                    if (sortBy == "Wins")
-                        entry.Wins = reader.GetInt32(1);
-                    else if (sortBy == "Balance")
-                        entry.Balance = reader.GetInt32(1);
-                    results.Add(entry);
+                        Username = reader.GetString(0),
+                        Wins = reader.GetInt32(1),
+                        Losses = reader.GetInt32(2),
+                        WinStreak = reader.GetInt32(3),
+                        Balance = reader.GetDecimal(4),
+                        GamesPlayed = reader.GetInt32(5)
+                    });
                 }
-                return results;
+                return list;
             }
         }
     }
