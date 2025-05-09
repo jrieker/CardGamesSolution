@@ -1,4 +1,4 @@
-﻿using CardGamesSolution.Server.Shared;
+using CardGamesSolution.Server.Shared;
 using System.Numerics;
 
 namespace CardGamesSolution.Server.Blackjack
@@ -69,19 +69,18 @@ namespace CardGamesSolution.Server.Blackjack
             Console.WriteLine($"Dealer draws {card.Number} of {card.Suit} (Total: {dealerValue})");
 
             if (dealerValue >= 21)
-                return (card, dealerValue, false); 
+                return (card, dealerValue, false);
 
-            foreach (var player in players)
-            {
-                int playerValue = player.PlayerHand.valueOfHand();
-                if (playerValue <= 21 && playerValue >= dealerValue)
-                {
-                    return (card, dealerValue, true); 
-                }
-            }
+            bool dealerBeatsEveryone = players
+                .Where(p => p.PlayerHand.valueOfHand() <= 21)
+                .All(p => dealerValue > p.PlayerHand.valueOfHand());
 
-            return (card, dealerValue, false);
+            if (dealerBeatsEveryone)
+                return (card, dealerValue, false);
+
+            return (card, dealerValue, true);
         }
+
 
         public float ComputePayout(int playerValue, int dealerValue, float bet)
         {
