@@ -53,6 +53,11 @@ function Blackjack({ loggedInPlayers }) {
     const [dealStarted, setDealStarted] = useState(false);
     const [dealFinished, setDealFinished] = useState(false);
     const [bustMessageVisible, setBustMessageVisible] = useState(false);
+    const [bustMessageText, setBustMessageText] = useState("Bust");
+    const [canQuit, setCanQuit] = useState(false);
+
+
+
 
     useEffect(() => {
         if (!loggedInPlayers || loggedInPlayers.length === 0) return;
@@ -66,6 +71,8 @@ function Blackjack({ loggedInPlayers }) {
             .then(data => {
                 setPlayers(data.players);
                 setActivePlayerIndex(data.currentTurnIndex);
+                console.log("Backend players response:", data.players);
+
             })
             .catch(err => console.error("Error starting game:", err));
     }, [loggedInPlayers]);
@@ -132,14 +139,32 @@ function Blackjack({ loggedInPlayers }) {
             } else {
                 setDealerCardsRevealed(prev => prev + 1);
             }
+
             setDealerHand(data.cards);
             setDealerCount(data.handValue);
 
+            if (data.winner) {
+                setBustMessageText(data.winner);
+                setBustMessageVisible(true);
+                setTimeout(async () => {
+                    setBustMessageVisible(false);
+                    setBustMessageText("Bust");
+                    await handleEndRound(); 
+                    setCanQuit(true);
+                }, 2000);
+            }
 
-            continueDrawing = data.shouldContinue;
-            if (continueDrawing) await sleep(500);
+
+
+            if (!data.shouldContinue) {
+                continueDrawing = false;
+                break;
+            }
+
+            await sleep(500);
         }
     };
+
 
     const handleHit = async () => {
         const userId = players[activePlayerIndex].userId;
@@ -251,6 +276,27 @@ function Blackjack({ loggedInPlayers }) {
         }
     };
 
+    const handleEndRound = async () => {
+        const res = await fetch('/api/blackjack/end', {
+            method: 'POST'
+        });
+        const data = await res.json();
+
+        setPlayers(data.players);
+        setActivePlayerIndex(data.currentTurnIndex);
+        setPlayerHands([]);
+        setPlayerCounts([]);
+        setDealerHand([]);
+        setDealerCount(0);
+        setRevealedCards({});
+        setDealerCardsRevealed(0);
+        setBets({});
+        setDealStarted(false);
+        setDealFinished(false);
+        setBustMessageVisible(false);
+        setBustMessageText("Bust");
+    };
+
 
     return (
         <div className="table-screen">
@@ -266,8 +312,30 @@ function Blackjack({ loggedInPlayers }) {
                     textShadow: '0 0 10px black',
                     zIndex: 99
                 }}>
-                    Bust
+                    {bustMessageText}
                 </div>
+            )}
+
+            {canQuit && !dealStarted && (
+                <button className="quit-button" onClick={() => {
+                    setPlayers([]);
+                    setActivePlayerIndex(null);
+                    setPlayerHands([]);
+                    setPlayerCounts([]);
+                    setDealerHand([]);
+                    setDealerCount(0);
+                    setRevealedCards({});
+                    setDealerCardsRevealed(0);
+                    setBets({});
+                    setDealStarted(false);
+                    setDealFinished(false);
+                    setBustMessageVisible(false);
+                    setBustMessageText("Bust");
+                    setCanQuit(false);
+                    window.location.reload();
+                }}>
+                    Quit to Main Menu
+                </button>
             )}
 
             <div className="dealer-area">
@@ -305,7 +373,7 @@ function Blackjack({ loggedInPlayers }) {
                                     renderCard({ value: card.number, suit: card.suit }, index)
                                 )}
                             </div>
-                            <div className={`count ${(revealedCards[i] || 0) > 0 ? '' : 'invisible'}`}>
+                            <div className={`count ${(revealedCards[i] || 0) >= 2 ? '' : 'invisible'}`}>
                                 {playerCounts[i]}
                             </div>
 
@@ -360,17 +428,27 @@ function Blackjack({ loggedInPlayers }) {
                             className={`chip ${getChipClass(amount)}`}
                             onClick={() => {
                                 if (activePlayerIndex === null || dealStarted) return;
-                                setBets(prev => {
-                                    const prevAmount = prev[activePlayerIndex]?.amount || 0;
-                                    return {
-                                        ...prev,
-                                        [activePlayerIndex]: {
-                                            chip: amount,
-                                            amount: prevAmount + amount,
-                                            visible: true
-                                        }
-                                    };
-                                });
+
+                                setCanQuit(false);
+
+                                const player = players[activePlayerIndex];
+                                const currentAmount = bets[activePlayerIndex]?.amount || 0;
+
+                                const maxAllowed = player.balance > 0 ? player.balance : 5;
+
+                                if (currentAmount + amount > maxAllowed) {
+                                    alert(`You can't bet more than $${maxAllowed}.`);
+                                    return;
+                                }
+
+                                setBets(prev => ({
+                                    ...prev,
+                                    [activePlayerIndex]: {
+                                        chip: amount,
+                                        amount: currentAmount + amount,
+                                        visible: true
+                                    }
+                                }));
                             }}
                         >
                             {amount}
@@ -380,6 +458,7 @@ function Blackjack({ loggedInPlayers }) {
             </div>
         </div>
     );
+
 }
 
 export default Blackjack;
