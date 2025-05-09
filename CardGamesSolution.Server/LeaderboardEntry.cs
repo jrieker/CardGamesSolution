@@ -1,33 +1,27 @@
-﻿namespace CardGamesSolution.Server.Leaderboard.CardGamesSolution.Server.Leaderboard
+namespace CardGamesSolution.Server.Leaderboard
 {
     using System.Text.Json.Serialization;
-        /// <summary>
+
         /// Represents a single leaderboard entry (scoreboard result) for a player.
-        /// </summary>
+  
         public class LeaderboardEntry
         {
-            /// <summary>Gets or sets the username of the player.</summary>
-            [JsonPropertyName("username")]
-            public string Username { get; set; }
+            /// Gets or sets the username of the player.
+            public required string Username { get; set; }
 
-            /// <summary>Gets or sets the total number of wins.</summary>
-            [JsonPropertyName("wins")]
+            /// Gets or sets the total number of wins.
             public int Wins { get; set; }
 
-            /// <summary>Gets or sets the total number of losses.</summary>
-            [JsonPropertyName("losses")]
+            /// Gets or sets the total number of losses.
             public int Losses { get; set; }
 
-            /// <summary>Gets or sets the current consecutive win streak.</summary>
-            [JsonPropertyName("winStreak")]
+            /// Gets or sets the current consecutive win streak.
             public int WinStreak { get; set; }
 
-            /// <summary>Gets or sets the player's account balance (monetary value).</summary>
-            [JsonPropertyName("balance")]
+            /// Gets or sets the player's account balance (monetary value).
             public decimal Balance { get; set; }
 
-            /// <summary>Gets or sets the total number of games played.</summary>
-            [JsonPropertyName("gamesPlayed")]
+            /// Gets or sets the total number of games played.
             public int GamesPlayed { get; set; }
         }
 
