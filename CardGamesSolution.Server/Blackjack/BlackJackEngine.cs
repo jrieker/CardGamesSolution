@@ -1,3 +1,4 @@
+using CardGamesSolution.Server.Database;
 using CardGamesSolution.Server.Shared;
 using CardGamesSolution.Server.UserAccount;
 
@@ -10,6 +11,13 @@ namespace CardGamesSolution.Server.Blackjack
         private Hand _dealerHand = new Hand();
         private int currentTurnIndex = 0;
         private bool dealerSecondCardFlipped = false;
+
+        private readonly UserDataAccessor _userDataAccessor;
+
+        public BlackJackEngine(UserDataAccessor userDataAccessor)
+        {
+            _userDataAccessor = userDataAccessor;
+        }
 
         public List<Player> Intialize(User[] users)
         {
@@ -327,8 +335,16 @@ namespace CardGamesSolution.Server.Blackjack
 
         public object EndRound()
         {
+
             foreach (var player in _players)
             {
+                // ATTEMPTS TO UPDATE DATABASE, THIS DOES NOT WORK
+                var user = _userDataAccessor.GetUserByUsername(player.PlayerName);
+                user.Balance = player.Balance;
+
+                _userDataAccessor.SaveUserData(user);
+                // END ATTEMPTING TO UPDATE DATABASE
+                
                 player.PlayerHand.clearHand();
                 player.BetValue = 0;
             }
