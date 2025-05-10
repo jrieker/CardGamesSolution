@@ -455,7 +455,14 @@ function Blackjack({ loggedInPlayers }) {
                         </button>
                     ))}
                 </div>
+
+                {activePlayerIndex !== null && players[activePlayerIndex] && (
+                    <div className="balance-indicator">
+                        Balance: ${players[activePlayerIndex].balance - (bets[activePlayerIndex]?.amount || 0)}
+                    </div>
+                )}
             </div>
+
         </div>
     );
 
