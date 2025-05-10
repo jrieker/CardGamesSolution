@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import './Solitaire.css';
 
+// how suits are displayed
+
+
 const SUIT_SYMBOLS = {
   Hearts: '♥',
   Diamonds: '♦',
   Clubs: '♣',
   Spades: '♠'
 };
+
+// how numbers are displayed
 
 const getCardLabel = (number) => {
   if (number === 1) return 'A';
@@ -16,9 +21,14 @@ const getCardLabel = (number) => {
   return number.toString();
 };
 
+// holds currrent game data and tracks last card clicked
+
 function Solitaire({ username }) {
   const [gameState, setGameState] = useState(null);
   const [selectedCard, setSelectedCard] = useState(null);
+
+// how you start/initialize game, calls start to connect to backend
+// gets starting game state
 
   useEffect(() => {
     const startGame = async () => {
@@ -33,6 +43,14 @@ function Solitaire({ username }) {
     };
     startGame();
   }, []);
+
+// used for when a user moves a card
+// tells the specific card, where it is, where you try to move it
+// if move is good it updates gamestate and clears selected card
+// if move is bad it prints a message for why, but i have this silenced
+// right now so that you can play a game without the browser prompting you
+// it will just not let you move the attempted move instead of stopping
+// and prompting
 
   const handleMove = async (toPile) => {
     if (!selectedCard) return;
@@ -62,14 +80,16 @@ function Solitaire({ username }) {
     }
   };
 
+// this is used to render every card in tableau waste foundation
+
   const renderCard = (card, faceUp, index, fromPile) => {
     if (!card) return null;
+
+// ignore null cards for now
+
     const color = card.suit === 'Hearts' || card.suit === 'Diamonds' ? 'red' : 'black';
-    const isSelected =
-      selectedCard &&
-      selectedCard.card.suit === card.suit &&
-      selectedCard.card.number === card.number &&
-      selectedCard.fromPile === fromPile;
+
+// determines card color
 
     const handleClick = () => {
       if (!faceUp) return;
@@ -87,10 +107,13 @@ function Solitaire({ username }) {
       }
     };
 
+// Selects if nothing selected, deselects if already selected
+// trys the move if different previous card selected
+
     return faceUp ? (
       <div
-        key={index}
-        className={`card ${isSelected ? 'selected' : ''}`}
+      key={`${card.suit}-${card.number}-${fromPile}-${index}`}
+        className="card"
         style={{
           top: `${index * 15}px`,
           width: '50px',
@@ -118,8 +141,16 @@ function Solitaire({ username }) {
     );
   };
 
+// stacks cards vertically 15px apart
+// position: 'absolute' allows card stacking
+// cursor: 'pointer' indicates card can be clicked
+// card content has cards visual content
+
   const renderTableau = () => {
     if (!gameState?.tableau) return null;
+
+// draws the 7 tableau piles
+// for each pile face down cards come first
 
     return (
       <div style={{ display: 'flex', gap: '15px', padding: '20px 40px' }}>
@@ -144,11 +175,23 @@ function Solitaire({ username }) {
     );
   };
 
+// clicks foundation to drop card on, calls handle move with foundation pile as destination
+
   const handleFoundationClick = (suit) => {
     handleMove(suit);
   };
 
   if (!gameState) return <div>Loading game...</div>;
+
+  // prevents rendering board before game is actually setup
+  // puts username in top left corner of screen
+  // has stock and waste layout
+  // calls the backend for drawing card and reloads state
+  // renders back of card in stock cards avaliable, if not will show empty area and you are out of cards
+  // does this for waste after
+  // lays out four foundation piles
+  // if empty shows dashed box for foundation, if not shows the top card in foundation (doesn't ever do this
+  // , this is what I tried to get it to do)
 
   return (
     <div className="table-screen">
