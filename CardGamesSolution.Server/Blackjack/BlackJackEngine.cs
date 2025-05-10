@@ -59,6 +59,24 @@ namespace CardGamesSolution.Server.Blackjack
 
         public (Card? drawnCard, int handValue, bool shouldContinue) DealerStepDraw(Hand dealerHand, Deck deck, List<Player> players)
         {
+            int currentDealerValue = dealerHand.valueOfHand();
+
+            var nonBustedPlayers = players
+                .Where(p => p.PlayerHand.valueOfHand() <= 21)
+                .ToList();
+
+            if (nonBustedPlayers.Any())
+            {
+                int maxPlayerValue = nonBustedPlayers
+                    .Max(p => p.PlayerHand.valueOfHand());
+
+                if (currentDealerValue == maxPlayerValue && currentDealerValue > 17)
+                {
+                    Console.WriteLine($"Dealer and player(s) tied at {currentDealerValue}. Push triggered. Dealer stops.");
+                    return (null, currentDealerValue, false); 
+                }
+            }
+
             var card = deck.Draw();
             if (card == null)
                 return (null, dealerHand.valueOfHand(), false);
@@ -71,8 +89,7 @@ namespace CardGamesSolution.Server.Blackjack
             if (dealerValue >= 21)
                 return (card, dealerValue, false);
 
-            bool dealerBeatsEveryone = players
-                .Where(p => p.PlayerHand.valueOfHand() <= 21)
+            bool dealerBeatsEveryone = nonBustedPlayers
                 .All(p => dealerValue > p.PlayerHand.valueOfHand());
 
             if (dealerBeatsEveryone)
@@ -80,6 +97,7 @@ namespace CardGamesSolution.Server.Blackjack
 
             return (card, dealerValue, true);
         }
+
 
 
         public float ComputePayout(int playerValue, int dealerValue, float bet)
