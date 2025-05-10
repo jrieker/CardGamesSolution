@@ -213,17 +213,44 @@ namespace CardGamesSolution.Server.Blackjack
 
                 handValue = _dealerHand.valueOfHand();
 
-                bool isHigherOrEqualToAll = _players
+                var nonBustedPlayers = _players
                     .Where(p => p.PlayerHand.valueOfHand() <= 21)
-                    .All(p => handValue >= p.PlayerHand.valueOfHand());
+                    .ToList();
 
-                if (handValue <= 21 && isHigherOrEqualToAll)
+                int maxPlayerValue = nonBustedPlayers
+                    .Max(p => p.PlayerHand.valueOfHand());
+
+                if (handValue == maxPlayerValue && handValue > 17)
                 {
-                    winner = "Dealer Wins";
+                    var tiedPlayers = nonBustedPlayers
+                        .Where(p => p.PlayerHand.valueOfHand() == handValue)
+                        .ToList();
+
+                    foreach (var p in tiedPlayers)
+                    {
+                        p.Balance += p.BetValue;
+                        Console.WriteLine($"{p.PlayerName} pushes with dealer and gets back ${p.BetValue}. New balance: ${p.Balance}");
+                    }
+
+                    winner = string.Join(", ", tiedPlayers.Select(p => p.PlayerName)) + " Push";
+                    Console.WriteLine("Dealer and player(s) tied at " + handValue + ". Push: " + winner);
+
                     shouldContinue = false;
-                    Console.WriteLine("Dealer wins immediately after revealing second card.");
+                }
+                else
+                {
+                    bool dealerBeatsAll = nonBustedPlayers
+                        .All(p => handValue > p.PlayerHand.valueOfHand());
+
+                    if (handValue <= 21 && dealerBeatsAll)
+                    {
+                        winner = "Dealer Wins";
+                        shouldContinue = false;
+                        Console.WriteLine("Dealer wins immediately after revealing second card.");
+                    }
                 }
             }
+
             else
             {
                 (drawnCard, handValue, shouldContinue) = _engine.DealerStepDraw(_dealerHand, _deck, _players);
@@ -238,12 +265,16 @@ namespace CardGamesSolution.Server.Blackjack
                         var winningPlayers = _players
                             .Where(p => p.PlayerHand.valueOfHand() <= 21 &&
                                         p.PlayerHand.valueOfHand() >= preValue)
-                            .Select(p => p.PlayerName)
                             .ToList();
 
                         if (winningPlayers.Any())
                         {
-                            winner = string.Join(", ", winningPlayers) + " Wins";
+                            winner = string.Join(", ", winningPlayers.Select(p => p.PlayerName)) + " Wins";
+                            foreach (var p in winningPlayers)
+                            {
+                                p.Balance += p.BetValue * 2;
+                                Console.WriteLine($"{p.PlayerName} wins and now has ${p.Balance}");
+                            }
                             Console.WriteLine($"Dealer busts. Winners: {winner}");
                         }
                     }
@@ -253,10 +284,43 @@ namespace CardGamesSolution.Server.Blackjack
                             .Where(p => p.PlayerHand.valueOfHand() <= 21)
                             .All(p => handValue >= p.PlayerHand.valueOfHand());
 
-                        if (handValue <= 21 && isHigherOrEqualToAll)
+                        if (handValue <= 21)
                         {
-                            winner = "Dealer Wins";
-                            Console.WriteLine("Dealer wins after drawing cards.");
+                            var nonBustedPlayers = _players
+                                .Where(p => p.PlayerHand.valueOfHand() <= 21)
+                                .ToList();
+
+                            int maxPlayerValue = nonBustedPlayers
+                                .Max(p => p.PlayerHand.valueOfHand());
+
+                            if (handValue == maxPlayerValue && handValue > 17)
+                            {
+                                var tiedPlayers = nonBustedPlayers
+                                    .Where(p => p.PlayerHand.valueOfHand() == handValue)
+                                    .ToList();
+
+                                foreach (var p in tiedPlayers)
+                                {
+                                    p.Balance += p.BetValue;
+                                    Console.WriteLine($"{p.PlayerName} pushes with dealer and gets back ${p.BetValue}. New balance: ${p.Balance}");
+                                }
+
+                                if (tiedPlayers.Any())
+                                {
+                                    winner = string.Join(", ", tiedPlayers.Select(p => p.PlayerName)) + " Push";
+                                    Console.WriteLine("Dealer and player(s) tied at " + handValue + ". Push: " + winner);
+                                }
+                                else
+                                {
+                                    winner = "Dealer Wins";
+                                    Console.WriteLine("Dealer wins after drawing cards.");
+                                }
+                            }
+                            else
+                            {
+                                winner = "Dealer Wins";
+                                Console.WriteLine("Dealer wins after drawing cards.");
+                            }
                         }
                     }
                 }
@@ -272,6 +336,7 @@ namespace CardGamesSolution.Server.Blackjack
                 winner
             };
         }
+
 
 
         public object EndRound()
@@ -307,6 +372,5 @@ namespace CardGamesSolution.Server.Blackjack
                 currentTurnIndex
             };
         }
-
     }
 }
