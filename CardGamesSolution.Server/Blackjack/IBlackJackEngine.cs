@@ -1,19 +1,19 @@
+using System.Numerics;
 using CardGamesSolution.Server.Shared;
-using CardGamesSolution.Server.UserAccount;
 
 namespace CardGamesSolution.Server.Blackjack
 {
     public interface IBlackJackEngine
     {
-        List<Player> Intialize(User[] users);
-        int GetCurrentTurnIndex();
-        object DealInitialCards();
-        object RegisterBet(string username, float amount);
-        object Hit(int userId);
-        object Stand(int userId);
-        object Double(int userId);
-        object DealerStep();
-        (Card? drawnCard, int handValue, bool shouldContinue) DealerStepDraw(Hand dealerHand, Deck deck, List<Player> players);
-        object EndRound();
+        public void DealHands(List<Player> players, Hand dealerHand, Deck deck);
+
+        public int Hit(Hand hand, Deck deck);
+
+
+        public int PlayDealer(Hand dealerHand, Deck deck);
+
+
+        public float ComputePayout(int playerValue, int dealerValue, float bet);
+
     }
 }
