@@ -1,3 +1,4 @@
+using CardGamesSolution.Server.Database;
 using CardGamesSolution.Server.Shared;
 using CardGamesSolution.Server.UserAccount;
 
@@ -12,9 +13,12 @@ namespace CardGamesSolution.Server.Blackjack
         private readonly BlackJackEngine _engine;
         private bool dealerSecondCardFlipped = false;
 
-        public BlackJackManager(BlackJackEngine engine)
+        private readonly IUserDataAccessor _userDataAccessor;
+
+        public BlackJackManager(BlackJackEngine engine, IUserDataAccessor userDataAccessor)
         {
             _engine = engine;
+            _userDataAccessor = userDataAccessor;
         }
 
         public List<Player> Intialize(User[] users)
@@ -44,6 +48,7 @@ namespace CardGamesSolution.Server.Blackjack
 
         public object DealInitialCards()
         {
+            Console.WriteLine("Dealing");
             foreach (var player in _players)
             {
                 player.PlayerHand = new Hand();
@@ -89,12 +94,15 @@ namespace CardGamesSolution.Server.Blackjack
 
         public object RegisterBet(string username, float amount)
         {
+            Console.WriteLine("Betting");
             var player = _players.FirstOrDefault(p => p.PlayerName == username);
             if (player == null)
-                return new { success = false, message = "Player not found" };
-
+                Console.WriteLine("Player is null");
+            return new { success = false, message = "Player not found" };
+       
             if (amount > player.Balance)
             {
+                Console.WriteLine("Bet check 2");
                 if (player.Balance == 0 && amount == 5)
                 {
                     player.BetValue = amount;
@@ -105,10 +113,10 @@ namespace CardGamesSolution.Server.Blackjack
 
                     return new { success = true, currentTurnIndex };
                 }
-
+                Console.WriteLine("Bet check 3");
                 return new { success = false, message = "Cannot bet more than current balance." };
             }
-
+            
             player.BetValue = amount;
             player.Balance -= amount;
 
@@ -116,7 +124,7 @@ namespace CardGamesSolution.Server.Blackjack
 
             if (currentTurnIndex < _players.Count - 1)
                 currentTurnIndex++;
-
+            Console.WriteLine("Finished Betting");
             return new { success = true, currentTurnIndex };
         }
 
@@ -365,9 +373,9 @@ namespace CardGamesSolution.Server.Blackjack
 
                 // Figure out how to save balances to database
 
-                // user = _userDataAccessor.GetUserByUsername(player.PlayerName)
-                // user.Balance = player.Balance
-                // _userDataAccesor.SaveUserData(user)
+                User user = _userDataAccessor.GetUserByUsername(player.PlayerName);
+                user.Balance = player.Balance;
+                _userDataAccessor.SaveUserData(user);
 
                 player.PlayerHand.clearHand();
                 player.BetValue = 0;
