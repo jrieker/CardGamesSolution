@@ -13,12 +13,9 @@ namespace CardGamesSolution.Server.Blackjack
         private readonly BlackJackEngine _engine;
         private bool dealerSecondCardFlipped = false;
 
-        private readonly IUserDataAccessor _userDataAccessor;
-
-        public BlackJackManager(BlackJackEngine engine, IUserDataAccessor userDataAccessor)
+        public BlackJackManager(BlackJackEngine engine)
         {
             _engine = engine;
-            _userDataAccessor = userDataAccessor;
         }
 
         public List<Player> Intialize(User[] users)
@@ -48,7 +45,6 @@ namespace CardGamesSolution.Server.Blackjack
 
         public object DealInitialCards()
         {
-            Console.WriteLine("Dealing");
             foreach (var player in _players)
             {
                 player.PlayerHand = new Hand();
@@ -94,15 +90,12 @@ namespace CardGamesSolution.Server.Blackjack
 
         public object RegisterBet(string username, float amount)
         {
-            Console.WriteLine("Betting");
             var player = _players.FirstOrDefault(p => p.PlayerName == username);
             if (player == null)
-                Console.WriteLine("Player is null");
             return new { success = false, message = "Player not found" };
-       
+
             if (amount > player.Balance)
             {
-                Console.WriteLine("Bet check 2");
                 if (player.Balance == 0 && amount == 5)
                 {
                     player.BetValue = amount;
@@ -113,7 +106,6 @@ namespace CardGamesSolution.Server.Blackjack
 
                     return new { success = true, currentTurnIndex };
                 }
-                Console.WriteLine("Bet check 3");
                 return new { success = false, message = "Cannot bet more than current balance." };
             }
             
@@ -124,7 +116,6 @@ namespace CardGamesSolution.Server.Blackjack
 
             if (currentTurnIndex < _players.Count - 1)
                 currentTurnIndex++;
-            Console.WriteLine("Finished Betting");
             return new { success = true, currentTurnIndex };
         }
 
@@ -365,7 +356,7 @@ namespace CardGamesSolution.Server.Blackjack
 
 
 
-        public object EndRound()
+        public object EndRound(IUserDataAccessor _userDataAccessor)
         {
 
             foreach (var player in _players)
