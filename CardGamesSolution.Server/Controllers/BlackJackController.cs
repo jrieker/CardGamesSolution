@@ -2,6 +2,7 @@ using CardGamesSolution.Server.UserAccount;
 using CardGamesSolution.Server.Blackjack;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using CardGamesSolution.Server.Database;
 
 namespace CardGamesSolution.Server.Controllers
 {
@@ -10,10 +11,11 @@ namespace CardGamesSolution.Server.Controllers
     public class BlackJackController : ControllerBase
     {
         private readonly BlackJackManager manager;
-
-        public BlackJackController(BlackJackManager newManager)
+        private readonly IUserDataAccessor userDataAccessor;
+        public BlackJackController(BlackJackManager newManager, IUserDataAccessor newUserDataAccessor)
         {
             manager = newManager;
+            userDataAccessor = newUserDataAccessor;
         }
 
         [HttpPost("start")]
@@ -42,7 +44,7 @@ namespace CardGamesSolution.Server.Controllers
         [HttpPost("end")]
         public IActionResult EndRound()
         {
-            var result = manager.EndRound();
+            var result = manager.EndRound(userDataAccessor);
             return Ok(result);
         }
 
@@ -50,7 +52,6 @@ namespace CardGamesSolution.Server.Controllers
         [HttpPost("deal")]
         public IActionResult Deal()
         {
-            Console.Write("Trying to deal");
             var result = manager.DealInitialCards();
             return Ok(result);
         }
@@ -79,8 +80,6 @@ namespace CardGamesSolution.Server.Controllers
         [HttpPost("bet")]
         public IActionResult Bet([FromBody] BetRequestDto data)
         {
-            Console.WriteLine("Trying to bet");
-            Console.WriteLine(data.Username);
             var result = manager.RegisterBet(data.Username, data.Amount);
             return Ok(result);
         }
