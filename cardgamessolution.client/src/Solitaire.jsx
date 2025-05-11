@@ -89,9 +89,9 @@ function Solitaire({ username }) {
         key={`${card.suit}-${card.number}-${fromPile}-${index}`}
         className="card"
         style={{
-          top: `${index * 15}px`,
-          width: '50px',
-          height: '70px',
+          top: `${index * 25}px`,
+          width: '80px',
+          height: '112px',
           position: 'absolute',
           cursor: 'pointer'
         }}
@@ -110,7 +110,12 @@ function Solitaire({ username }) {
       <div
         key={index}
         className="card-back"
-        style={{ top: `${index * 15}px`, position: 'absolute' }}
+        style={{
+          top: `${index * 25}px`,
+          width: '80px',
+          height: '112px',
+          position: 'absolute'
+        }}
       />
     );
   };
@@ -119,7 +124,7 @@ function Solitaire({ username }) {
     if (!gameState?.tableau) return null;
 
     return (
-      <div style={{ display: 'flex', gap: '15px', padding: '20px 40px' }}>
+      <div style={{ display: 'flex', gap: '30px', padding: '30px 60px' }}>
         {gameState.tableau.map((pile, i) => {
           const pileName = `Pile${i + 1}`;
           const isEmpty = pile.faceUp.length === 0 && pile.faceDown.length === 0;
@@ -127,7 +132,7 @@ function Solitaire({ username }) {
             <div
               key={i}
               className={isEmpty ? 'empty-pile' : ''}
-              style={{ position: 'relative', width: '50px', height: '400px' }}
+              style={{ position: 'relative', width: '80px', height: '600px' }}
               onClick={(e) => {
                 if (
                   e.target.classList.contains('card-back') ||
@@ -162,8 +167,8 @@ function Solitaire({ username }) {
         {username}
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '20px 40px' }}>
-        <div style={{ display: 'flex', gap: '20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '30px 60px' }}>
+        <div style={{ display: 'flex', gap: '30px' }}>
           <div
             onClick={async () => {
               await fetch('/api/solitaire/draw', { method: 'POST' });
@@ -175,21 +180,21 @@ function Solitaire({ username }) {
             style={{ cursor: 'pointer' }}
           >
             {gameState.stock?.length ? (
-              <div className="card-back" />
+              <div className="card-back" style={{ width: '80px', height: '112px' }} />
             ) : (
-              <div style={{ width: '50px', height: '70px', border: '1px solid gray' }} />
+              <div style={{ width: '80px', height: '112px', border: '1px solid gray' }} />
             )}
           </div>
           <div>
             {gameState.waste?.length ? (
               renderCard(gameState.waste.at(-1), true, 0, 'Waste')
             ) : (
-              <div style={{ width: '50px', height: '70px', border: '1px solid white' }} />
+              <div style={{ width: '80px', height: '112px', border: '1px solid white' }} />
             )}
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '20px' }}>
+        <div style={{ display: 'flex', gap: '30px' }}>
           {['Hearts', 'Diamonds', 'Clubs', 'Spades'].map((suit) => {
             const pile = gameState.foundations?.[suit] ?? [];
             const topCard = pile.at?.(-1);
@@ -199,15 +204,16 @@ function Solitaire({ username }) {
                 key={suit}
                 onClick={() => handleFoundationClick(suit)}
                 style={{
-                  width: '50px',
-                  height: '70px',
+                  width: '80px',
+                  height: '112px',
                   border: topCard ? 'none' : '2px dashed white',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: 'white',
                   fontSize: '20px',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  position: 'relative'
                 }}
               >
                 {topCard
