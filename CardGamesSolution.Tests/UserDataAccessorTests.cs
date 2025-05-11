@@ -40,7 +40,7 @@ namespace CardGamesSolution.Tests
         }
 
         [TestMethod]
-        public void SaveUserData_UpdatesUser()
+        public void SaveUserData_AddsUser()
         {
             // Arrange
             string username = "testUserB";
@@ -66,10 +66,38 @@ namespace CardGamesSolution.Tests
         }
 
         [TestMethod]
-        public void UserExists_ReturnsTrue()
+        public void SaveUserData_UpdatesUser()
         {
             // Arrange
             string username = "testUserC";
+            if (userDataAccessor.UserExists(username)) {
+                userDataAccessor.DeleteUserByUsername(username);
+            }
+            var user = new User(userDataAccessor.GetNextUserId(), username, "initial", 1, 1, 10.0f, 2);
+            userDataAccessor.SaveUserData(user);
+            user = userDataAccessor.GetUserByUsername(username);
+            user.Balance = 5.0f;
+
+            // Act
+            userDataAccessor.SaveUserData(user);
+            var savedUser = userDataAccessor.GetUserByUsername(username);
+
+            // Assert
+            Assert.IsNotNull(savedUser);
+            Assert.AreEqual(user.UserId, savedUser.UserId);
+            Assert.AreEqual(user.Username, savedUser.Username);
+            Assert.AreEqual(user.Password, savedUser.Password);
+            Assert.AreEqual(user.Wins, savedUser.Wins);
+            Assert.AreEqual(user.Losses, savedUser.Losses);
+            Assert.AreEqual(user.Balance, savedUser.Balance);
+            Assert.AreEqual(user.GamesPlayed, savedUser.GamesPlayed);
+        }
+
+        [TestMethod]
+        public void UserExists_ReturnsTrue()
+        {
+            // Arrange
+            string username = "testUserD";
             if (!userDataAccessor.UserExists(username)) {
                 userDataAccessor.SaveUserData(new User(userDataAccessor.GetNextUserId(), username, "somepass"));
             }
@@ -85,7 +113,7 @@ namespace CardGamesSolution.Tests
         public void UserExists_ReturnsFalse()
         {
             // Arrange
-            string username = "testUserD";
+            string username = "testUserE";
             if (userDataAccessor.UserExists(username)) {
                 userDataAccessor.DeleteUserByUsername(username);
             }
