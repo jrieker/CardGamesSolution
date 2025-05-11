@@ -248,7 +248,9 @@ function Blackjack({ loggedInPlayers }) {
     const handleBet = async (playerIndex) => {
         const username = players[playerIndex]?.username;
         const amount = bets[playerIndex]?.amount || 0;
-
+        console.log("Trying to bet");
+        console.log(username);
+        console.log(amount);
         const response = await fetch('/api/blackjack/bet', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -274,6 +276,7 @@ function Blackjack({ loggedInPlayers }) {
         } else {
             setActivePlayerIndex(result.currentTurnIndex);
         }
+        console.log("Trying to betEnd");
     };
 
     const handleEndRound = async () => {
