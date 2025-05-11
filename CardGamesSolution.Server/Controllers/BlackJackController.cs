@@ -19,6 +19,7 @@ namespace CardGamesSolution.Server.Controllers
         [HttpPost("start")]
         public IActionResult Start([FromBody] User[] users)
         {
+            Console.WriteLine("Starting game");
             if (users == null || users.Length == 0)
                 return BadRequest("At least one user is required to start a game.");
 
@@ -49,6 +50,7 @@ namespace CardGamesSolution.Server.Controllers
         [HttpPost("deal")]
         public IActionResult Deal()
         {
+            Console.Write("Trying to deal");
             var result = manager.DealInitialCards();
             return Ok(result);
         }
@@ -77,6 +79,8 @@ namespace CardGamesSolution.Server.Controllers
         [HttpPost("bet")]
         public IActionResult Bet([FromBody] BetRequestDto data)
         {
+            Console.WriteLine("Trying to bet");
+            Console.WriteLine(data.Username);
             var result = manager.RegisterBet(data.Username, data.Amount);
             return Ok(result);
         }
