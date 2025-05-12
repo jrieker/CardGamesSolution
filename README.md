@@ -16,6 +16,8 @@ To run the Solitaire or Blackjack game, first make sure you have Node.js (for th
 
 - The frontend is built with React and displays the game board, cards, and controls
 - The backend is written in C# and handles all game logic, like validating moves, drawing cards, and tracking game state
+- The UI updates automatically after every move using the game state sent from the backend
+
 
 ### Cards are organized into four main areas:
 
@@ -35,7 +37,6 @@ To run the Solitaire or Blackjack game, first make sure you have Node.js (for th
  - Move cards from the waste or tableau to the foundation if they are the next in suit and order
  - Draw cards from the stock pile into the waste, one at a time
  - You can move full stacks between tableau columns if they follow the color and order rule
- - The UI updates automatically after every move using the game state sent from the backend
 
 ## Blackjack
 
