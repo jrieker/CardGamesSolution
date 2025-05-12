@@ -27,6 +27,7 @@ Cards are organized into four main areas:
 How to Play:
 
  - Clicking a card selects it; clicking a valid spot moves it
+ - When clicking on a stack to move it, click the highest number card to move the stack
  - The game only allows legal moves based on Solitaire rules
  - The UI updates automatically after every move using the game state sent from the backend
 
