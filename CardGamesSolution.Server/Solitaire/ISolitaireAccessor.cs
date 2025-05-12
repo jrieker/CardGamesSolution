@@ -10,5 +10,5 @@ namespace CardGamesSolution.Server.Solitaire {
         void SaveGame(GameState gameState);
         GameState LoadSavedGame();
     }
-    // none of this is really implemented yet
+    
 }
