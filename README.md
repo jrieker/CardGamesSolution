@@ -1,8 +1,10 @@
 # CardGamesSolution
 
-Solitaire
+How to Start the CardGames Web App:
 
-To run the Solitaire game, first make sure you have Node.js (for the frontend) and .NET 8 SDK (for the backend) installed. Open a terminal and start the backend by going into the CardGamesSolution.Server folder and running dotnet run. Then on a local web browser open the http://localhost:3000
+To run the Solitaire or Blackjack game, first make sure you have Node.js (for the frontend) and .NET 8 SDK (for the backend) installed. Open a terminal and start the backend by going into the CardGamesSolution.Server folder and running dotnet run. Then on a local web browser open the http://localhost:3000
+
+Solitaire
 
 - The frontend is built with React and displays the game board, cards, and controls.
 - The backend is written in C# and handles all game logic, like validating moves, drawing cards, and tracking game state.
