@@ -8,14 +8,16 @@ namespace CardGamesSolution.Tests
     {
         private IDatabaseConnection databaseConnection;
         private IUserDataAccessor userDataAccessor;
-        private LoginManager loginManager;
+        private LoginEngine loginEngine;
+        private ILoginManager loginManager;
 
         [TestInitialize]
         public void Setup()
         {
             databaseConnection = new DatabaseConnection();
             userDataAccessor = new UserDataAccessor(databaseConnection);
-            loginManager = new LoginManager(userDataAccessor);
+            loginEngine = new LoginEngine(userDataAccessor);
+            loginManager = new LoginManager(loginEngine);
         }
 
         [TestMethod]
