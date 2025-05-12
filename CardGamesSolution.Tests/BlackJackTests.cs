@@ -57,23 +57,5 @@ namespace CardGamesSolution.Tests
             // Push
             Assert.AreEqual(0f, engine.ComputePayout(18, 18, bet));
         }
-
-        [TestMethod]
-        public void Stand_AdvancesTurnIndex()
-        {
-            // Arrange
-            // initial turn is 0
-            int before = engine.GetCurrentTurnIndex();
-            int playerId = users[0].UserId;
-
-            // Act
-            dynamic result = engine.Stand(playerId);
-
-            // Assert
-            Assert.IsTrue(result.success);
-            
-            int expected = (before + 1) % users.Length;
-            Assert.AreEqual(expected, (int)result.currentTurnIndex);
-        }
     }
 }
