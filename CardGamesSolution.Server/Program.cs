@@ -9,7 +9,6 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IDatabaseConnection, DatabaseConnection>();
 builder.Services.AddScoped<IUserDataAccessor, UserDataAccessor>();
 
-builder.Services.AddScoped<LoginEngine>();
 builder.Services.AddScoped<ILoginManager, LoginManager>();
 
 builder.Services.AddSingleton<BlackJackEngine>();
