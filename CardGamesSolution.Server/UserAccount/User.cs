@@ -1,6 +1,6 @@
 ﻿namespace CardGamesSolution.Server.UserAccount
 {
-    public class User : IUserAccessor
+    public class User
     {
         // Properties
         public int UserId { get; set; }
