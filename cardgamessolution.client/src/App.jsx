@@ -2,12 +2,14 @@ import { useState } from 'react';
 import './App.css';
 import Blackjack from './Blackjack';
 import Solitaire from './Solitaire';
+import Leaderboard from './Leaderboard'; 
 
 function App() {
     const [screen, setScreen] = useState('main');
     const [authMode, setAuthMode] = useState('login');
     const [playerList, setPlayerList] = useState([]);
     const [solitaireUsername, setSolitaireUsername] = useState('');
+    const [showLeaderboard, setShowLeaderboard] = useState(false); 
 
     const handleAddPlayer = (userObj) => {
         setPlayerList(prev => {
@@ -21,7 +23,6 @@ function App() {
                 : [...prev, userObj];
         });
     };
-
 
     const handleRemovePlayer = (username) => {
         setPlayerList(prev => prev.filter(player => player.username !== username));
@@ -45,9 +46,16 @@ function App() {
                 <button
                     className="auth-button"
                     onClick={async () => {
-                        const username = document.querySelector('input[placeholder="Username"]').value;
-                        const password = document.querySelector('input[placeholder="Password"]').value;
+                        const username = document.querySelector('input[placeholder="Username"]').value.trim();
+                        const password = document.querySelector('input[placeholder="Password"]').value.trim();
+
+                        if (!username || !password) {
+                            alert("Please enter both a username and password.");
+                            return;
+                        }
+
                         const endpoint = authMode === 'login' ? 'login' : 'register';
+
 
                         try {
                             const response = await fetch(`/api/user/${endpoint}`, {
@@ -147,11 +155,33 @@ function App() {
 
     return (
         <div className={`app-container screen ${backgroundClass}`}>
-            {screen === 'main' && renderMainMenu()}
-            {screen === 'solitaireAuth' && renderAuthScreen('solitaire')}
-            {screen === 'blackjackAuth' && renderAuthScreen('blackjack')}
-            {screen === 'blackjackGame' && <Blackjack loggedInPlayers={playerList} />}
-            {screen === 'solitaireGame' && <Solitaire username={solitaireUsername} />}
+            {!showLeaderboard && screen === 'main' && (
+                <button className="leaderboard-button" onClick={() => setShowLeaderboard(true)}>Leaderboard</button>
+            )}
+
+
+            {showLeaderboard ? (
+                <>
+                    <button className="back-button" onClick={() => setShowLeaderboard(false)}>&larr; Back</button>
+                    <Leaderboard
+                        players={playerList.map((p, i) => ({
+                            id: p.userId,
+                            name: p.username,
+                            score: p.wins - p.losses,
+                            balance: p.balance,
+                            wins: p.wins
+                        }))}
+                    />
+                </>
+            ) : (
+                <>
+                    {screen === 'main' && renderMainMenu()}
+                    {screen === 'solitaireAuth' && renderAuthScreen('solitaire')}
+                    {screen === 'blackjackAuth' && renderAuthScreen('blackjack')}
+                    {screen === 'blackjackGame' && <Blackjack loggedInPlayers={playerList} />}
+                    {screen === 'solitaireGame' && <Solitaire username={solitaireUsername} />}
+                </>
+            )}
         </div>
     );
 }
