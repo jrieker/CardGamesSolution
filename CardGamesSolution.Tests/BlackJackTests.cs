@@ -1,4 +1,3 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CardGamesSolution.Server.Blackjack;
 using CardGamesSolution.Server.Shared;
 using System.Collections.Generic;
@@ -86,7 +85,7 @@ namespace CardGamesSolution.Tests
 
             // Assert
             Assert.AreEqual(dealerHand.valueOfHand(), finalValue);
-            Assert.IsTrue(finalValue >= 17)
+            Assert.IsTrue(finalValue >= 17);
 
             int afterCount = dealerHand.getCards().Count;
             Assert.IsTrue(afterCount > beforeCount);
