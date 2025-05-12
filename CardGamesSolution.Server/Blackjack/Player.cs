@@ -1,6 +1,6 @@
 namespace CardGamesSolution.Server.Blackjack
 {
-    public class Player : IPlayer
+    public class Player
     {   
         //Values for player
         public int PlayerId { get; set; }
