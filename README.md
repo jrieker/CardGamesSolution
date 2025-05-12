@@ -38,14 +38,17 @@ To run the Solitaire or Blackjack game, first make sure you have Node.js (for th
  - The UI updates automatically after every move using the game state sent from the backend
 
 ## Blackjack
+
 - The frontend is built using react and handles the display of the cards, hands, and players
-- The backend is built using C#, and handles all game logic from placing a bet to proccessing an end of round
+- The backend is built using C#, and handles all game logic from placing a bet to processing an end of round
 
 ### Three Key hands
+
 There are three key hands:
-1. Your hand
-2. Dealers Hand
-3. (Optional) Others Players' haands
+
+ - Your hand
+ - Dealers Hand
+ - (Optional) Others Players' hands
 
 ### How to Play:
 
