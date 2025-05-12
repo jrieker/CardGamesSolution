@@ -5,12 +5,11 @@ using CardGamesSolution.Server.Blackjack;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddScoped<LoginManager>();
+builder.Services.AddScoped<LoginEngine>();
 builder.Services.AddScoped<IUserDataAccessor, UserDataAccessor>();
 builder.Services.AddScoped<IDatabaseConnection, DatabaseConnection>();
 
 builder.Services.AddSingleton<BlackJackEngine>();
-builder.Services.AddSingleton<BlackJackManager>();
 
 var app = builder.Build();
 
