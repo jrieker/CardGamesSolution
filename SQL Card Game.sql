@@ -1,6 +1,6 @@
 
 
-drop table Poker;
+drop table BlackJack;
 drop table Solitaire;
 drop table LeaderBoard;
 drop table Game;
@@ -38,8 +38,8 @@ create table LeaderBoard(
 	UserId int FOREIGN KEY REFERENCES Users(UserID)
 );
 
-create table Poker(
-	PokerID int not null,
+create table BlackJack(
+	BlackJackID int not null,
 	Wins int,
 	Losses int,
 	winStreak int,
