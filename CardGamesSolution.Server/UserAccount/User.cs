@@ -2,7 +2,6 @@
 {
     public class User
     {
-        // Properties
         public int UserId { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
@@ -13,7 +12,6 @@
 
         public User() { }
 
-        //Constructors
         public User(int userId, string username, string password)
         {
             this.UserId = userId;
@@ -36,7 +34,6 @@
             this.GamesPlayed = gamesPlayed;
         }
 
-        // Method placeholders
         public void UpdateBalance(float amount)
         {
             this.Balance += amount;
