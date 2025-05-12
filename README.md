@@ -29,6 +29,12 @@ To run the Solitaire or Blackjack game, first make sure you have Node.js (for th
  - Clicking a card selects it; clicking a valid spot moves it
  - When clicking on a stack to move it, click the highest number card to move the stack
  - The game only allows legal moves based on Solitaire rules
+ - Build four foundation piles by suit from Ace to King to win
+ - Only alternating colors and descending numbers can stack in the tableau
+ - Only a King (or stack starting with a King) can be moved to an empty tableau column
+ - Move cards from the waste or tableau to the foundation if they are the next in suit and order
+ - Draw cards from the stock pile into the waste, one at a time
+ - You can move full stacks between tableau columns if they follow the color and order rule
  - The UI updates automatically after every move using the game state sent from the backend
 
 ## Blackjack
