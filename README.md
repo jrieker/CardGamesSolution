@@ -6,8 +6,8 @@ To run the Solitaire or Blackjack game, first make sure you have Node.js (for th
 
 Solitaire
 
-- The frontend is built with React and displays the game board, cards, and controls.
-- The backend is written in C# and handles all game logic, like validating moves, drawing cards, and tracking game state.
+- The frontend is built with React and displays the game board, cards, and controls
+- The backend is written in C# and handles all game logic, like validating moves, drawing cards, and tracking game state
 
 Cards are organized into four main areas:
 
