@@ -58,7 +58,7 @@ function App() {
 
 
                         try {
-                            const response = await fetch(`/api/usermanager/${endpoint}`, {
+                            const response = await fetch(`/api/user/${endpoint}`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ username, password })
