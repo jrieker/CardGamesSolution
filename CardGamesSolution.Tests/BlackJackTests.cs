@@ -28,7 +28,7 @@ namespace CardGamesSolution.Tests
                 new Player(2, "Bob",   100)
             };
 
-            Hand dealersHand = new Hand(deck.Draw(),deck.Draw());
+            Hand dealersHand = new Hand();
 
             // Act
             engine.DealHands(players, dealersHand, deck);
