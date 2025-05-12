@@ -8,7 +8,6 @@ namespace CardGamesSolution.Tests
     {
         private IDatabaseConnection databaseConnection;
         private IUserDataAccessor userDataAccessor;
-        private LoginEngine loginEngine;
         private ILoginManager loginManager;
 
         [TestInitialize]
@@ -16,8 +15,7 @@ namespace CardGamesSolution.Tests
         {
             databaseConnection = new DatabaseConnection();
             userDataAccessor = new UserDataAccessor(databaseConnection);
-            loginEngine = new LoginEngine(userDataAccessor);
-            loginManager = new LoginManager(loginEngine);
+            loginManager = new LoginManager(userDataAccessor);
         }
 
         [TestMethod]
