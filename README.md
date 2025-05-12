@@ -6,7 +6,8 @@ To run the Solitaire or Blackjack game, first make sure you have Node.js (for th
 
 How the Login Functionality Works:
 
-
+- Before playing users must login through a login screen
+- A username and password are required to start the game
 
 Solitaire
 
