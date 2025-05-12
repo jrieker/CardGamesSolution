@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using CardGamesSolution.Server.UserAccount;
-using CardGamesSolution.Server.Database;
 
 namespace CardGamesSolution.Server.Controllers
 {
