@@ -7,7 +7,10 @@ To run the Solitaire or Blackjack game, first make sure you have Node.js (for th
 How the Login Functionality Works:
 
 - Before playing users must login through a login screen
-- A username and password are required to start the game
+- If the user does not already have an account, one can be created
+- Up to 6 users can be logged in at a time while playing Blackjack
+- Only one player can be logged in while playing Solitaire
+- User stats (balance, wins, etc.) are saved to the database at the end of the round.
 
 Solitaire
 
