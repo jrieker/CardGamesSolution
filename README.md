@@ -1,8 +1,24 @@
 # CardGamesSolution
 
-How to Start the CardGames Web App:
+## How to Start the CardGames Web App
 
-To run the Solitaire or Blackjack game, first make sure you have Node.js (for the frontend) and .NET 8 SDK (for the backend) installed. Open a terminal and start the backend by going into the CardGamesSolution.Server folder and running dotnet run. Then on a local web browser open the http://localhost:3000
+To run the **Solitaire** or **Blackjack** game locally, follow these steps:
+
+1. Make sure you have **Node.js** (for the frontend) and **.NET 8 SDK** (for the backend) installed.
+2. Run the `SQL Card Game.sql` file on your local SQL Server to create the required database.
+3. Open `CardGamesSolution.Server/Database/DatabaseConnection.cs` and update the connection string to point to your local database.
+4. In a terminal, go to the backend folder and run:
+   ```bash
+   cd CardGamesSolution.Server
+   dotnet run
+   ```
+5. Open your browser and go to [http://localhost:3000](http://localhost:3000)
+
+---
+
+If you don’t want to set it up locally, here’s a video demo of the game:  
+🎥 [Watch the demo here](https://www.youtube.com/watch?v=rP4oaY3Rhk0)
+
 
 ## How the Login Functionality Works:
 
