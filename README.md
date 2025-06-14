@@ -16,8 +16,8 @@ To run the **Solitaire** or **Blackjack** game locally, follow these steps:
 
 ---
 
-If you don’t want to set it up locally, here’s a video demo of the game:  
-🎥 [Watch the demo here](https://www.youtube.com/watch?v=rP4oaY3Rhk0)
+If you don’t want to set it up locally, you can see a demo of the game here: 
+🎥 [Watch demo](https://www.youtube.com/watch?v=rP4oaY3Rhk0)
 
 ---
 
